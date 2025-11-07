@@ -17,6 +17,13 @@ struct ContentView: View {
             Text("Hi")
         }
         .padding()
+        .onAppear(
+            perform: {
+                var key = grabApiKey()
+                print(key)
+                
+            }
+        )
     }
 }
 
