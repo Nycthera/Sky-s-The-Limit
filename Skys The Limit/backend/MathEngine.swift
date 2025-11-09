@@ -1,3 +1,10 @@
+//
+//  MathEngine.swift
+//  Skys The Limit
+//
+//  Created by Chris on 7/11/25.
+//
+
 import Foundation
 
 enum EquationType: String {
