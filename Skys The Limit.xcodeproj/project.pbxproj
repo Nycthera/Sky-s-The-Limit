@@ -12,12 +12,25 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		D9B57B6B2EC0805B00D92C59 /* Skys The Limit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Skys The Limit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D98DCA392EC1D96F003B9097 /* Skys The Limit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Skys The Limit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D98DCA3B2EC1D97D003B9097 /* Exceptions for "Skys The Limit" folder in "Skys The Limit" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Skys-The-Limit-Info.plist",
+			);
+			target = D9B57B6A2EC0805B00D92C59 /* Skys The Limit */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D9B57B6D2EC0805B00D92C59 /* Skys The Limit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D98DCA3B2EC1D97D003B9097 /* Exceptions for "Skys The Limit" folder in "Skys The Limit" target */,
+			);
 			path = "Skys The Limit";
 			sourceTree = "<group>";
 		};
@@ -40,16 +53,8 @@
 			isa = PBXGroup;
 			children = (
 				D9B57B6D2EC0805B00D92C59 /* Skys The Limit */,
-				D9B57B6C2EC0805B00D92C59 /* Products */,
+				D98DCA392EC1D96F003B9097 /* Skys The Limit.app */,
 			);
-			sourceTree = "<group>";
-		};
-		D9B57B6C2EC0805B00D92C59 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				D9B57B6B2EC0805B00D92C59 /* Skys The Limit.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -76,7 +81,7 @@
 				D98DCA1B2EC179F8003B9097 /* SwiftMath */,
 			);
 			productName = "Skys The Limit";
-			productReference = D9B57B6B2EC0805B00D92C59 /* Skys The Limit.app */;
+			productReference = D98DCA392EC1D96F003B9097 /* Skys The Limit.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -108,7 +113,7 @@
 				D98DCA1A2EC179F8003B9097 /* XCRemoteSwiftPackageReference "SwiftMath" */,
 			);
 			preferredProjectObjectVersion = 77;
-			productRefGroup = D9B57B6C2EC0805B00D92C59 /* Products */;
+			productRefGroup = D9B57B622EC0805B00D92C59;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -269,6 +274,7 @@
 				DEVELOPMENT_TEAM = 4PP5ZD3GV5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Skys-The-Limit-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -302,6 +308,7 @@
 				DEVELOPMENT_TEAM = 4PP5ZD3GV5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Skys-The-Limit-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
