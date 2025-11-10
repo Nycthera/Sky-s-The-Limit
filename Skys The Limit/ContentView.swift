@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        EquationListView()
+        MainMenuView()
             .task { @MainActor in
                 print("posting to db")
                 await post_to_database()

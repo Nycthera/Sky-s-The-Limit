@@ -16,7 +16,7 @@ struct MainMenuView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .edgesIgnoringSafeArea(.all)
-
+            
             // VStack for the content
             VStack(spacing: 30) {
                 
@@ -24,14 +24,14 @@ struct MainMenuView: View {
                     .font(.custom("{PlaceHolder}", size: 50)) // <-- Replace with your font's name
                     .foregroundColor(.white)
                     .padding(.top, 50)
-
+                
                 Image("{PlaceHolder}")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 150, height: 150)
-
+                
                 Spacer()
-
+                
                 // The three menu options as buttons
                 VStack(alignment: .leading, spacing: 40) {
                     Button(action: {
@@ -81,30 +81,30 @@ struct WelcomeView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .edgesIgnoringSafeArea(.all)
-
+                
                 // VStack arranges the content vertically.
                 VStack(spacing: 20) {
                     Spacer()
-
+                    
                     // The welcome text
                     Text("Welcome to")
                         .font(.custom("{PlaceHolder}", size: 40)) // <-- Replace with your font's name
                         .foregroundColor(.white)
-
+                    
                     Text("Sky's The Limit")
                         .font(.custom("{PlaceHolder}", size: 60)) // <-- Replace with your font's name
                         .foregroundColor(.white)
-
+                    
                     Spacer()
-
+                    
                     // The comet image from your assets
                     Image("{PlaceHolder}")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 200, height: 200)
-
+                    
                     Spacer()
-
+                    
                     // The navigation button that takes the user to the main menu.
                     // It's a NavigationLink that is styled to look like a custom button.
                     NavigationLink(destination: MainMenuView()) {
