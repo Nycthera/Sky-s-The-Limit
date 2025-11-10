@@ -11,6 +11,8 @@ import JSONCodable
 class Appwrite {
     var client: Client
     var account: Account
+    var database: Databases
+    var table: TablesDB
     
     public init() {
         self.client = Client()
@@ -18,34 +20,9 @@ class Appwrite {
             .setProject("690d951a00110f06cd0f")
         
         self.account = Account(client)
+        self.database = Databases(client)
+        self.table = TablesDB(client)
     }
-    
-    public func onRegister(
-        _ email: String,
-        _ password: String
-    ) async throws -> User<[String: AnyCodable]> {
-        try await account.create(
-            userId: ID.unique(),
-            email: email,
-            password: password
-        )
-    }
-    
-    public func onLogin(
-        _ email: String,
-        _ password: String
-    ) async throws -> Session {
-        try await account.createEmailPasswordSession(
-            email: email,
-            password: password
-        )
-    }
-    
-    public func onLogout() async throws {
-        _ = try await account.deleteSession(
-            sessionId: "current"
-        )
-    }
-    
 }
 
+let appwrite = Appwrite()
