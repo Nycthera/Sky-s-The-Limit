@@ -7,30 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D0F1B6D42EC1E59C0002B463 /* Skys-The-Limit-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D0F1B6D32EC1E59C0002B463 /* Skys-The-Limit-Info.plist */; };
 		D98DCA1C2EC179F8003B9097 /* SwiftMath in Frameworks */ = {isa = PBXBuildFile; productRef = D98DCA1B2EC179F8003B9097 /* SwiftMath */; };
 		D9B57B882EC0815200D92C59 /* Appwrite in Frameworks */ = {isa = PBXBuildFile; productRef = D9B57B872EC0815200D92C59 /* Appwrite */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D0F1B6D32EC1E59C0002B463 /* Skys-The-Limit-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Skys-The-Limit-Info.plist"; sourceTree = "<group>"; };
 		D98DCA392EC1D96F003B9097 /* Skys The Limit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Skys The Limit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D98DCA3B2EC1D97D003B9097 /* Exceptions for "Skys The Limit" folder in "Skys The Limit" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"Skys-The-Limit-Info.plist",
-			);
-			target = D9B57B6A2EC0805B00D92C59 /* Skys The Limit */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D9B57B6D2EC0805B00D92C59 /* Skys The Limit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				D98DCA3B2EC1D97D003B9097 /* Exceptions for "Skys The Limit" folder in "Skys The Limit" target */,
-			);
 			path = "Skys The Limit";
 			sourceTree = "<group>";
 		};
@@ -54,6 +43,7 @@
 			children = (
 				D9B57B6D2EC0805B00D92C59 /* Skys The Limit */,
 				D98DCA392EC1D96F003B9097 /* Skys The Limit.app */,
+				D0F1B6D32EC1E59C0002B463 /* Skys-The-Limit-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -127,6 +117,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0F1B6D42EC1E59C0002B463 /* Skys-The-Limit-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,91 +2,139 @@ import Foundation
 import Appwrite
 import UIKit
 import AppwriteModels
-import JSONCodable
 
-let deviceID = UIDevice.current.identifierForVendor?.uuidString
-var userTableIDs: [String] = [] // store fetched row IDs
+// --- Global Constants & Variables ---
+let deviceID = UIDevice.current.identifierForVendor?.uuidString ?? "unknown_device"
 let databaseID = "69114f5e001d9116992a"
 let tableID = "constellation"
+let deviceID = UIDevice.current.identifierForVendor?.uuidString ?? "unknown-device"
 
-func post_to_database() async {
-    let userid = deviceID ?? ""
-    
+// This array will store the unique ID(s) of the user's document(s).
+var userTableIDs: [String] = []
+
+
+/// Creates a brand new document for a first-time user.
+func post_to_database(equations: [String]) async {
+    print("User has no document. Creating a new one...")
     do {
         let document = try await appwrite.table.createRow(
             databaseId: databaseID,
             tableId: tableID,
             rowId: ID.unique(),
             data: [
-                "userid": userid,
-                "equations": ["1", "1"]
+                "userid": deviceID,
+                "equations": equations
             ],
-            permissions: [Permission.read(Role.any())]
+            permissions: [
+                Permission.read(Role.any()),
+                Permission.update(Role.any()),
+                Permission.delete(Role.any())
+            ]
         )
-        print("Document created: \(document)")
+        print("Document created successfully: \(document.id)")
+        // After creating, we should update our list of known IDs.
+        userTableIDs.append(document.id)
     } catch {
         print("Error creating document: \(error.localizedDescription)")
     }
 }
 
+
+/// Fetches and stores the document IDs for the current user.
 func list_document_for_user() async {
-    let userid = deviceID ?? ""
-    
+    print("Checking for existing documents for user: \(deviceID)...")
     do {
         let rowList = try await appwrite.table.listRows(
             databaseId: databaseID,
             tableId: tableID,
             queries: [
-                Query.equal("userid", value: userid)
+                Query.equal("userid", value: deviceID)
             ]
         )
+        // Get all document IDs associated with this user.
+        userTableIDs = rowList.rows.map { $0.id }
         
-        // Extract IDs
-        userTableIDs = rowList.rows.compactMap { row in
-            row.data["$id"]?.value as? String
+        if userTableIDs.isEmpty {
+            print("No documents found for this user.")
+        } else {
+            print("Fetched row IDs: \(userTableIDs)")
         }
-        
-        print("Fetched row IDs: \(userTableIDs)")
-        print("Full rowList: \(rowList)")
-        
     } catch {
-        print("Error fetching rows: \(error.localizedDescription)")
+        print("Error listing documents: \(error.localizedDescription)")
     }
 }
 
-func get_documents_for_user() async {
-    for rowId in userTableIDs {
-        do {
-            let response = try await appwrite.table.getRow(
-                databaseId: databaseID,
-                tableId: tableID,
-                rowId: rowId
-            )
-            print("Fetched row: \(response)")
-        } catch {
-            print("Error fetching row \(rowId): \(error.localizedDescription)")
-        }
+
+/// Updates the user's first document with a new list of equations.
+/// If no document exists, it calls `post_to_database` to create one.
+func update_document_for_user(equations: [String]) async {
+    // Ensure we have a document ID to update.
+    guard let docIdToUpdate = userTableIDs.first else {
+        print("Update failed: No document ID found for the user. Attempting to create one.")
+        // If no document exists, we should create one instead.
+        await post_to_database(equations: equations)
+        return
     }
-}
-
-func update_document_for_user() async {
-    let userid = deviceID ?? ""
-    let equationsInUpdatFunc = Equations
-
+    
+    print("Updating document: \(docIdToUpdate)...")
     do {
-        let row = try await appwrite.table.updateRow(
+        _ = try await appwrite.table.updateRow(
             databaseId: databaseID,
             tableId: tableID,
-            rowId: userid,
+            rowId: docIdToUpdate,
             data: [
-                "userid": userid,
-                "equation": equationsInUpdatFunc
-            ], // optional
-            permissions: [Permission.read(Role.any())] // optional
-            // transactionId: "<TRANSACTION_ID>" // optional
+                "userid": deviceID,
+                "equations": equations
+            ],
+            permissions: [Permission.read(Role.any())]
         )
-        print("Document updated: \(row)")
+        print("Document updated successfully.")
     } catch {
         print("Error updating document: \(error.localizedDescription)")
+    }
+}
+
+// MARK: - Delete (DELETE)
+func delete_document(rowId: String) async {
+    do {
+        try await appwrite.table.deleteRow(
+            databaseId: databaseID,
+            tableId: tableID,
+            rowId: rowId
+        )
+        print("Document deleted: \(rowId)")
+    } catch {
+        print("Error deleting document: \(error.localizedDescription)")
+    }
+}
+
+// MARK: - Share / Unshare
+func toggle_share(rowId: String, share: Bool) async {
+    do {
+        let updated = try await appwrite.table.updateRow(
+            databaseId: databaseID,
+            tableId: tableID,
+            rowId: rowId,
+            data: [
+                "isShared": share
+            ]
+        )
+        print(share ? " Constellation shared: \(updated.id)" : "Constellation unshared: \(updated.id)")
+    } catch {
+        print("Error toggling share state: \(error.localizedDescription)")
+    }
+}
+
+// MARK: - Check shared document (public access)
+func get_shared_document(rowId: String) async {
+    do {
+        let document = try await appwrite.table.getRow(
+            databaseId: databaseID,
+            tableId: tableID,
+            rowId: rowId
+        )
+        print("Shared document fetched: \(document)")
+    } catch {
+        print("Error fetching shared document: \(error.localizedDescription)")
     }
 }
