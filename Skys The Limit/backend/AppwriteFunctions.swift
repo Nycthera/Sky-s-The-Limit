@@ -5,85 +5,44 @@ import AppwriteModels
 import JSONCodable
 
 let deviceID = UIDevice.current.identifierForVendor?.uuidString
-var userTableIDs: [String] = [] // store fetched row IDs
+var userTableIDs: [String] = []
 let databaseID = "69114f5e001d9116992a"
 let tableID = "constellation"
 
-func post_to_database() async {
-    let userid = deviceID ?? ""
-    
-    do {
-        let document = try await appwrite.table.createRow(
-            databaseId: databaseID,
-            tableId: tableID,
-            rowId: ID.unique(),
-            data: [
-                "userid": userid,
-                "equations": ["1", "1"]
-            ],
-            permissions: [Permission.read(Role.any())]
-        )
-        print("Document created: \(document)")
-    } catch {
-        print("Error creating document: \(error.localizedDescription)")
-    }
-}
+// ... (your other functions like post_to_database, list_document_for_user can stay the same) ...
 
 func list_document_for_user() async {
     let userid = deviceID ?? ""
-    
     do {
         let rowList = try await appwrite.table.listRows(
             databaseId: databaseID,
             tableId: tableID,
-            queries: [
-                Query.equal("userid", value: userid)
-            ]
+            queries: [Query.equal("userid", value: userid)]
         )
-        
-        // Extract IDs
-        userTableIDs = rowList.rows.compactMap { row in
-            row.data["$id"]?.value as? String
-        }
-        
+        userTableIDs = rowList.rows.map { $0.id }
         print("Fetched row IDs: \(userTableIDs)")
-        print("Full rowList: \(rowList)")
-        
     } catch {
         print("Error fetching rows: \(error.localizedDescription)")
     }
 }
 
-func get_documents_for_user() async {
-    for rowId in userTableIDs {
-        do {
-            let response = try await appwrite.table.getRow(
-                databaseId: databaseID,
-                tableId: tableID,
-                rowId: rowId
-            )
-            print("Fetched row: \(response)")
-        } catch {
-            print("Error fetching row \(rowId): \(error.localizedDescription)")
-        }
+// MODIFIED FUNCTION
+func update_document_for_user(equations: [String]) async {
+    guard let docIdToUpdate = userTableIDs.first else {
+        print("Cannot update: No document ID found for the user.")
+        // You could call post_to_database() here to create a new document if none exist
+        return
     }
-}
-
-func update_document_for_user() async {
+    
     let userid = deviceID ?? ""
-    let equationsInUpdatFunc = Equations
-
+    
     do {
         let row = try await appwrite.table.updateRow(
             databaseId: databaseID,
             tableId: tableID,
-            rowId: userid,
-            data: [
-                "userid": userid,
-                "equation": equationsInUpdatFunc
-            ], // optional
-            permissions: [Permission.read(Role.any())] // optional
-            // transactionId: "<TRANSACTION_ID>" // optional
+            rowId: docIdToUpdate,
+            data: ["userid": userid, "equations": equations],
+            permissions: [Permission.read(Role.any())]
         )
         print("Document updated: \(row)")
     } catch {

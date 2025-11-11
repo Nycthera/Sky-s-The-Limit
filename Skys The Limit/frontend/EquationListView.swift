@@ -1,42 +1,83 @@
-
 import SwiftUI
-import SwiftMath  // means swift math not working
 
 struct EquationListView: View {
-   
-    @State private var equationText = "y = x^{2}"
+    @EnvironmentObject var equationStore: EquationStore
+    @State private var latexString = "y=x^{2}"
+    @State private var graphPoints: [(x: Double, y: Double)] = []
 
-    var body: some View {
-        VStack {
-         Spacer()
-         
-         // The live-rendering display area from the SwiftMath library.
-         // If you get an error on this line, it means Xcode's build system
-         // cannot find the compiled code from the SwiftMath library.
-            MathView()
-                .font(.system(size: 40))
-                .padding()
-                .frame(maxWidth: .infinity, minHeight: 150)
-                .background(Color.gray.opacity(0.15))
-                .cornerRadius(12)
-         
-         // A helper view to show the raw LaTeX string (useful for debugging).
-         Text("Raw LaTeX: \(equationText)")
-                .font(.caption.monospaced())
-                .foregroundColor(.secondary)
-                .padding(.bottom)
-         
-         // The custom keyboard component. It passes changes up to this
-         
-         MathKeyboardView(latexString: $equationText)
-         }
-            .padding()
-         }
+    // This sets the appearance for the navigation bar.
+    init() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithTransparentBackground()
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
 
+    var body: some View {
+        VStack(spacing: 15) {
+            // Live-rendering display area
+            MathView(equation: latexString, fontSize: 40)
+                .frame(maxWidth: .infinity, minHeight: 100)
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(12)
+            
+            // Live-rendering graph view
+            GraphCanvasView(points: graphPoints)
+                .frame(height: 250)
 
-struct EquationListView_Previews: PreviewProvider {
-    static var previews: some View {
+            // The custom keyboard component
+            MathKeyboardView(latexString: $latexString)
+            
+            Button("Save To Galaxy") {
+                equationStore.saveEquation(latex: latexString)
+            }
+            .font(.custom("SpaceMono-Regular", size: 20))
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.white)
+            .foregroundColor(.black)
+            .cornerRadius(15)
+        }
+        .padding()
+        .background(
+            Image("Space")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .edgesIgnoringSafeArea(.all)
+        )
+        .onChange(of: latexString) { _, newLatex in
+            updateGraph()
+        }
+        .onAppear {
+            updateGraph()
+        }
+        .navigationTitle("Draw The Stars")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    private func updateGraph() {
+        let engineFormattedString = latexToEngineFormat(latexString)
+        let engine = MathEngine(equation: engineFormattedString)
+        if engine.isValid() {
+            self.graphPoints = engine.calculatePoints()
+        } else {
+            self.graphPoints = []
+        }
+    }
+    
+    private func latexToEngineFormat(_ latex: String) -> String {
+        return latex
+            .replacingOccurrences(of: "\\", with: "")
+            .replacingOccurrences(of: "{", with: "(")
+            .replacingOccurrences(of: "}", with: ")")
+            .replacingOccurrences(of: "frac(a)(b)", with: "(a)/(b)")
+    }
+}
+
+#Preview {
+    NavigationView {
         EquationListView()
+            .environmentObject(EquationStore())
     }
 }
