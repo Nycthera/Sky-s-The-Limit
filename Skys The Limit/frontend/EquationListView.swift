@@ -23,6 +23,19 @@ struct EquationListView: View {
                         Text("Equations")
                             .font(.custom("SpaceMono-Bold", size: 24))
                             .foregroundColor(.white)
+                        Text("Target Coordinates")
+                            .font(.custom("SpaceMono-Bold", size: 18))
+                            .foregroundColor(.yellow)
+                            .padding(.bottom, 5)
+                        ForEach(Array(viewModel.stars.enumerated()), id: \.offset) { index, star in
+                            Text("Star \(index + 1): (\(Int(star.x)), \(Int(star.y)))")
+                                .font(.custom("SpaceMono-Regular", size: 16))
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.white.opacity(0.05))
+                                .cornerRadius(5)
+                        } // it works by essentially making a text block and displays the respective coordinates. The text is white with the space mono reg font.  and should be to able to fill the column from the left side
                         
                         ScrollView {
                             VStack(alignment: .leading, spacing: 8) {

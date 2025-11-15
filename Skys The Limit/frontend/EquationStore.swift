@@ -1,6 +1,5 @@
 import SwiftUI
-import Combine // <-- This is the required import
-
+import Combine
 @MainActor
 class EquationStore: ObservableObject {
     
