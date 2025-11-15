@@ -4,28 +4,26 @@ import Combine
 
 @MainActor
 class EquationPuzzleViewModel: ObservableObject {
-    // --- Puzzle State ---
+    // The puzzle state
     @Published var stars: [CGPoint] = []
     @Published var successfulLines: [[(x: Double, y: Double)]] = []
-    @Published var successfulEquations: [String] = [] // THIS IS THE MISSING LINE
     
-    // --- User Input State ---
+    // The current user input state
     @Published var currentLatexString: String = "y="
     @Published var currentGraphPoints: [(x: Double, y: Double)] = []
     
-    // --- Game Flow State ---
+    // The game flow state
     @Published var currentTargetIndex: Int = 0
     @Published var isPuzzleComplete: Bool = false
-    @Published var feedbackMessage: String = ""
 
     init() {
         generateNewPuzzle()
     }
     
+    /// Generates a new set of random stars and resets the game state.
     func generateNewPuzzle(starCount: Int = 4) {
         stars.removeAll()
         successfulLines.removeAll()
-        successfulEquations.removeAll() // Clear the new array
         currentTargetIndex = 0
         isPuzzleComplete = false
         resetCurrentLine()
@@ -41,11 +39,13 @@ class EquationPuzzleViewModel: ObservableObject {
         }
     }
     
+    /// Updates the live preview of the user's current equation.
     func updateUserGraph() {
         let engine = MathEngine(equation: currentLatexString)
         self.currentGraphPoints = engine.calculatePoints()
     }
     
+    /// Checks if the user's current line correctly connects the two target stars.
     func checkCurrentLineSolution() {
         guard stars.count > currentTargetIndex + 1 else { return }
         
@@ -57,22 +57,13 @@ class EquationPuzzleViewModel: ObservableObject {
         let connectsStarB = lineContainsPoint(line: currentGraphPoints, point: starB, tolerance: tolerance)
         
         if connectsStarA && connectsStarB {
-            // Save both the points and the equation string
             successfulLines.append(currentGraphPoints)
-            successfulEquations.append(currentLatexString) // Save the successful equation
-            
             currentTargetIndex += 1
             
             if currentTargetIndex >= stars.count - 1 {
                 isPuzzleComplete = true
-                feedbackMessage = "Constellation Complete!"
-            } else {
-                feedbackMessage = "Success! Now connect the next pair."
             }
             resetCurrentLine()
-            
-        } else {
-            feedbackMessage = "Not quite! Try a different equation."
         }
     }
     

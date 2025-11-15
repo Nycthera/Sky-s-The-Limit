@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftMath
 
 struct EquationListView: View {
     @StateObject private var viewModel = EquationPuzzleViewModel()
@@ -11,8 +10,10 @@ struct EquationListView: View {
                 .aspectRatio(contentMode: .fill)
                 .edgesIgnoringSafeArea(.all)
 
-            // Main Horizontal Layout
-            HStack(spacing: 15) {
+            // --- THE GEOMETRYREADER FIX ---
+            // This GeometryReader measures the available screen space (the 'geometry' proxy).
+            // We will use its height to calculate explicit frame sizes for our views.
+            GeometryReader { geometry in
                 
                 // --- LEFT COLUMN: Equations List ---
                 VStack(spacing: 10) {
@@ -41,6 +42,7 @@ struct EquationListView: View {
 
                 // --- RIGHT COLUMN: Interactive Area ---
                 VStack(spacing: 15) {
+                    
                     if !viewModel.isPuzzleComplete && viewModel.stars.count > viewModel.currentTargetIndex + 1 {
                         Text("Connect Star \(viewModel.currentTargetIndex + 1) to Star \(viewModel.currentTargetIndex + 2)")
                             .font(.custom("SpaceMono-Regular", size: 20))
@@ -54,13 +56,15 @@ struct EquationListView: View {
                         currentLine: viewModel.currentGraphPoints,
                         currentTargetIndex: viewModel.currentTargetIndex
                     )
-                    // --- FIX 2: Constrain the graph's height ---
-                    // This tells the graph to use the available vertical space,
-                    // but no more. This keeps it from pushing other views down.
-                    .frame(maxHeight: .infinity)
+                    // --- EXPLICIT HEIGHT ---
+                    // We tell the graph to be exactly 40% of the available screen height.
+                    // This is a non-negotiable command that fixes the layout.
+                    .frame(height: geometry.size.height * 0.40)
+                    
+                    // The Spacer is no longer needed because we are using explicit heights.
                     
                     MathView(equation: viewModel.currentLatexString, fontSize: 22)
-                        .frame(maxWidth: .infinity, minHeight: 60)
+                        .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
                         .background(Color.black.opacity(0.5))
                         .cornerRadius(12)
 
@@ -76,24 +80,27 @@ struct EquationListView: View {
                     .background(Color.white)
                     .foregroundColor(.black)
                     .cornerRadius(15)
+                    .disabled(viewModel.isPuzzleComplete)
+                    
+                    // Add a final spacer to push all content to the top if there's extra room.
+                    Spacer()
                 }
-                // --- FIX 3: Tell the right column to fill the remaining space ---
-                .frame(maxWidth: .infinity)
+                .padding()
             }
-            .padding()
             
-            // Puzzle Complete Overlay
+            // The "You Win!" overlay
             if viewModel.isPuzzleComplete {
                 // ... (Overlay code remains the same)
             }
         }
         .animation(.default, value: viewModel.isPuzzleComplete)
         .animation(.default, value: viewModel.currentTargetIndex)
-        .onChange(of: viewModel.currentLatexString) { _ in
+        .onChange(of: viewModel.currentLatexString) {
             viewModel.updateUserGraph()
         }
         .navigationTitle("Draw The Stars")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar { /* ... (Toolbar code remains the same) ... */ }
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .navigationBarBackButtonHidden(false)
     }
 }
