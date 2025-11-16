@@ -8,13 +8,13 @@
 import SwiftUI
 
 // MARK: - Key Types
-enum KeyType {
+enum KeyType: Hashable {
     case character
     case backspace
 }
 
 // MARK: - Math Key
-struct MathKey: Identifiable {
+struct MathKey: Identifiable, Hashable {
     let id = UUID()
     let display: String   // What the user sees on the button (LaTeX or symbol)
     let mathValue: String // Safe string for MathEngine evaluation
@@ -64,7 +64,7 @@ struct MathKeyboardView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            ForEach(keyboardLayout, id: \.first!.id) { row in
+            ForEach(keyboardLayout, id: \.self) { row in
                 HStack(spacing: 5) {
                     ForEach(row) { key in
                         Button {
@@ -114,3 +114,4 @@ struct MathKeyboardView: View {
         }
     }
 }
+

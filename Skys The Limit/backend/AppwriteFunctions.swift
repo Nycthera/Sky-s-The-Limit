@@ -2,6 +2,7 @@ import Foundation
 import Appwrite
 import UIKit
 import AppwriteModels
+import JSONCodable
 
 // --- Global Constants & Variables ---
 let deviceID = UIDevice.current.identifierForVendor?.uuidString ?? "unknown_device"
@@ -135,5 +136,52 @@ func get_shared_document(rowId: String) async {
         print("Shared document fetched: \(document)")
     } catch {
         print("Error fetching shared document: \(error.localizedDescription)")
+    }
+}
+
+/// Fetches the first document belonging to the current user
+/// and prints/returns its contents.
+func get_document_for_user() async {
+    // Ensure there is at least one document ID stored.
+    guard let docId = userTableIDs.first else {
+        print("No document ID found. Call list_document_for_user() first.")
+        return
+    }
+    
+    print("Fetching document with ID: \(docId)")
+    
+    do {
+        let document = try await appwrite.table.getRow(
+            databaseId: databaseID,
+            tableId: tableID,
+            rowId: docId
+        )
+
+        // Print the entire document (debug)
+        print("Document fetched successfully: \(document)")
+
+        // Safely extract specific fields from AnyCodable payloads
+        if let anyUserId = document.data["userid"],
+           let userid = (anyUserId as? AnyCodable)?.value as? String {
+            print("User ID: \(userid)")
+        } else {
+            print("User ID not found or not a String")
+        }
+
+        if let anyEquations = document.data["equations"],
+           let equationsValue = (anyEquations as? AnyCodable)?.value {
+            if let equations = equationsValue as? [String] {
+                print("Equations: \(equations)")
+            } else if let single = equationsValue as? String {
+                print("Equations (single string): [\(single)]")
+            } else {
+                print("Equations not found or not a [String]")
+            }
+        } else {
+            print("Equations key not present in document data")
+        }
+
+    } catch {
+        print("Error fetching document: \(error.localizedDescription)")
     }
 }

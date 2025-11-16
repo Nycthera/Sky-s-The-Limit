@@ -1,4 +1,9 @@
 import SwiftUI
+// to do
+// im gonna cry
+// 1. add tutorials
+// 2. fix line rendering
+// 3. stuff ig fix ui
 
 struct ContentView: View {
     var body: some View {
