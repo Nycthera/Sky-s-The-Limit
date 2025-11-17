@@ -12,7 +12,8 @@ struct ContentView: View {
             // It starts by showing the WelcomeView.
             FadeShowView()
         }
-        // This style is important for making navigation work consistently on iPad.
-        .navigationViewStyle(.stack)
+      
+        .navigationBarHidden(true)
+        .navigationBarBackButtonHidden(true)
     }
 }
