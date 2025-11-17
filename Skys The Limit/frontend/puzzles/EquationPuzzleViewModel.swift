@@ -48,9 +48,16 @@ class EquationPuzzleViewModel: ObservableObject {
     /// Updates the live preview of the user's current equation.
     func updateUserGraph() {
         let engine = MathEngine(equation: currentLatexString)
+        // Use evaluate() to validate and compute points (with logging/type detection),
+        // or calculatePoints(...) directly if you want silent computation.
+        if let points = engine.evaluate() {
+            currentGraphPoints = points
+        } else {
+            currentGraphPoints = []
+        }
     }
     
-    /// Checks if the user's current line correctly connects the two target stars.
+    // Checks if the user's current line correctly connects the two target stars.
     func checkCurrentLineSolution() {
         guard stars.count > currentTargetIndex + 1 else { return }
         
@@ -85,4 +92,15 @@ class EquationPuzzleViewModel: ObservableObject {
             return sqrt(dx*dx + dy*dy) < tolerance
         }
     }
+    
+    func generateLinePoints() {
+        let engine = MathEngine(equation: currentLatexString)
+        // Choose either evaluate() or calculatePoints with desired sampling.
+        if let points = engine.evaluate() {
+            currentGraphPoints = points
+        } else {
+            currentGraphPoints = []
+        }
+    }
 }
+
