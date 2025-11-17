@@ -17,13 +17,12 @@ enum EquationType: String {
     case unknown = "Unknown"
 }
 
-
-
 final class MathEngine {
     
     // Raw equation string from user
     var equation: String
     var domainRule: String?
+    
     // Default numeric values for symbolic coefficients
     var coefficients: [String: Double] = [
         "a": 1, "b": 1, "c": 1,
@@ -44,12 +43,9 @@ final class MathEngine {
            let end = self.equation.firstIndex(of: "}") {
             let rule = self.equation[self.equation.index(after: start)..<end]
             self.domainRule = String(rule)
-            
-            // Remove the { ... } from equation before parsing
             self.equation.removeSubrange(start...end)
         }
     }
-    
     
     // ------------------------------------------------------------
     // MARK: - Detect Equation Type
@@ -75,7 +71,6 @@ final class MathEngine {
         if eq.range(of: #"^[0-9\.\-]+$"#, options: .regularExpression) != nil {
             return .constant
         }
-        
         return .unknown
     }
     
@@ -92,7 +87,7 @@ final class MathEngine {
     // MARK: - Validate Format
     // ------------------------------------------------------------
     func isValid() -> Bool {
-        let validPattern = #"^[0-9a-zA-Z\^\+\-\*\/\(\)\.\=]+$"#
+        let validPattern = #"^[0-9a-zA-Z\^\+\-\*\/\(\)\.]+$"#
         return equation.range(of: validPattern, options: .regularExpression) != nil
     }
     
@@ -100,28 +95,29 @@ final class MathEngine {
     // MARK: - Safe Expression Check
     // ------------------------------------------------------------
     private func makeSafeExpressionString(_ input: String) -> String? {
+        var cleaned = input
         
-        // Reject comparison operators (NSExpression will crash)
-        if input.contains("==") || input.contains(">=") || input.contains("<=")
-            || input.contains("!=") || input.contains(">") || input.contains("<") {
+        // 1. Remove '='
+        cleaned = cleaned.replacingOccurrences(of: "=", with: "")
+        
+        // 2. Reject comparison operators
+        let comparisons = ["==", "!=", "<=", ">=", "<", ">"]
+        for op in comparisons {
+            if cleaned.contains(op) { return nil }
+        }
+        
+        // 3. Reject unsafe characters
+        if cleaned.rangeOfCharacter(from: disallowedExpressionCharacters) != nil {
             return nil
         }
         
-        // Reject any accidental "=" left over
-        if input.contains("=") { return nil }
-        
-        // Reject unsafe characters (quotes, pipes)
-        if input.rangeOfCharacter(from: disallowedExpressionCharacters) != nil {
-            return nil
-        }
-        
-        // Only allow math-safe characters
+        // 4. Only allow math-safe characters
         let validPattern = #"^[0-9a-zA-Z\^\+\-\*\/\(\)\.]+$"#
-        guard input.range(of: validPattern, options: .regularExpression) != nil else {
+        guard cleaned.range(of: validPattern, options: .regularExpression) != nil else {
             return nil
         }
         
-        return input
+        return cleaned
     }
     
     // ------------------------------------------------------------
@@ -130,7 +126,7 @@ final class MathEngine {
     private func preprocessEquation() -> String {
         var eq = strippedEquation()
         
-        // Remove any accidental RHS if user typed full equation (x+1=3)
+        // Remove RHS if present
         if let idx = eq.firstIndex(of: "=") {
             eq = String(eq[..<idx])
         }
@@ -171,11 +167,12 @@ final class MathEngine {
         return eq
     }
     
+    // ------------------------------------------------------------
+    // MARK: - Domain Check
+    // ------------------------------------------------------------
     private func xSatisfiesDomain(_ x: Double) -> Bool {
-        guard let rule = domainRule else { return true } // no domain means always true
+        guard let rule = domainRule else { return true }
         
-        // Split by < or >
-        // Example: -10 < x < 10  → ["-10", "x", "10"]
         let pattern = #"(-?[0-9\.]+)\s*([<>]=?)\s*x\s*([<>]=?)\s*(-?[0-9\.]+)"#
         if let regex = try? NSRegularExpression(pattern: pattern),
            let match = regex.firstMatch(in: rule, range: NSRange(rule.startIndex..., in: rule)) {
@@ -185,7 +182,6 @@ final class MathEngine {
             let rightOp = (rule as NSString).substring(with: match.range(at: 3))
             let rightValue = Double((rule as NSString).substring(with: match.range(at: 4)))!
             
-            // Evaluate left side
             let leftOK: Bool = {
                 switch leftOp {
                 case "<": return leftValue < x
@@ -196,7 +192,6 @@ final class MathEngine {
                 }
             }()
             
-            // Evaluate right side
             let rightOK: Bool = {
                 switch rightOp {
                 case "<": return x < rightValue
@@ -209,10 +204,8 @@ final class MathEngine {
             
             return leftOK && rightOK
         }
-        
-        return true // fallback
+        return true
     }
-    
     
     // ------------------------------------------------------------
     // MARK: - Calculate points
@@ -226,24 +219,16 @@ final class MathEngine {
         let processed = preprocessEquation()
         
         for x in stride(from: xRange.lowerBound, through: xRange.upperBound, by: step) {
+            if !xSatisfiesDomain(x) { continue }
             
-            // --- 1. Domain restriction check ---
-            if !xSatisfiesDomain(x) {
-                continue
-            }
-            
-            // --- 2. Substitute x into the processed equation ---
             let substituted = processed.replacingOccurrences(of: "x", with: "(\(x))")
             
-            // --- 3. Safety check for expression validity ---
             guard let safeExpr = makeSafeExpressionString(substituted) else {
                 print("Skipping unsafe expression:", substituted)
                 continue
             }
             
-            // --- 4. Evaluate using NSExpression ---
             let expr = NSExpression(format: safeExpr)
-            
             if let y = expr.expressionValue(with: nil, context: nil) as? Double,
                y.isFinite {
                 result.append((x, y))
@@ -252,7 +237,6 @@ final class MathEngine {
         
         return result
     }
-    
     
     // ------------------------------------------------------------
     // MARK: - Public Evaluate
@@ -268,13 +252,11 @@ final class MathEngine {
         
         let points = calculatePoints()
         
-        // ---- Clean print formatting ----
         let pretty = points
             .map { "(\($0.x), \($0.y))" }
             .joined(separator: ", ")
         
         print("[\(pretty)]")
-        
         return points
     }
 }

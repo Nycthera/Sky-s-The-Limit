@@ -34,8 +34,8 @@ struct MathKeyboardView: View {
             MathKey(display: "1", mathValue: "1", type: .character),
             MathKey(display: "2", mathValue: "2", type: .character),
             MathKey(display: "3", mathValue: "3", type: .character),
-            MathKey(display: "(", mathValue: "(", type: .character),
-            MathKey(display: ")", mathValue: ")", type: .character)
+//            MathKey(display: "(", mathValue: "(", type: .character),
+//            MathKey(display: ")", mathValue: ")", type: .character)
         ],
         [
             MathKey(display: "4", mathValue: "4", type: .character),
@@ -49,10 +49,10 @@ struct MathKeyboardView: View {
             MathKey(display: "8", mathValue: "8", type: .character),
             MathKey(display: "9", mathValue: "9", type: .character),
             MathKey(display: "0", mathValue: "0", type: .character),
-            MathKey(display: ",", mathValue: ",", type: .character)
+            MathKey(display: ".", mathValue: ",", type: .character)
         ],
         [
-            MathKey(display: "a/b", mathValue: "(", type: .character),  // placeholder for display
+//            MathKey(display: "a/b", mathValue: "(", type: .character),  // placeholder for display
             MathKey(display: "x²", mathValue: "^2", type: .character),
             MathKey(display: "√", mathValue: "sqrt(", type: .character),
             MathKey(display: "⌫", mathValue: "", type: .backspace),

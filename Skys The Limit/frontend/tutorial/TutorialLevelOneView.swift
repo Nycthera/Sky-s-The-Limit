@@ -25,6 +25,7 @@
 //            .tabViewStyle(.page(indexDisplayMode: .always))
 //        }
 //    }
+<<<<<<< HEAD
 ////    Button("Done"){
 ////        isShowingTutorial = false
 ////    }
@@ -35,5 +36,17 @@
 ////    .foregroundColor(.white)
 ////    .cornerRadius(15)
 ////    .padding()
+=======
+//    func Button("Done"){
+//        isShowingTutorial = false
+//    }
+//    .fontWeight(.semibold)
+//    .padding()
+//    .frame(maxWidth: .infinity)
+//    .background(Color.blue)
+//    .foregroundColor(.white)
+//    .cornerRadius(15)
+//    .padding()
+>>>>>>> main
 //    
 //}
