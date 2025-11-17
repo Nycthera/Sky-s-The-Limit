@@ -1,10 +1,3 @@
-//
-//  MathEngine.swift
-//  Skys The Limit
-//
-//  Created by Chris on 7/11/25.
-//
-
 import Foundation
 
 enum EquationType: String {
@@ -29,7 +22,6 @@ final class MathEngine {
         "m": 1, "n": 1
     ]
     
-    // Characters that crash NSExpression
     private let disallowedExpressionCharacters = CharacterSet(charactersIn: "\"|")
     
     // ------------------------------------------------------------
@@ -74,21 +66,26 @@ final class MathEngine {
         return .unknown
     }
     
-    // Strip leading "y=" or "f(x)="
+    // ------------------------------------------------------------
+    // MARK: - Strip LHS and cleanup
+    // ------------------------------------------------------------
     private func strippedEquation() -> String {
-        equation.replacingOccurrences(
-            of: #"^[a-zA-Z]\s*="#,
+        // Remove leading 'y=' or 'f(x)=' or any letter followed by '='
+        let eq = equation.replacingOccurrences(
+            of: #"^[a-zA-Z]+\s*="#,
             with: "",
             options: .regularExpression
         )
+        return eq
     }
     
     // ------------------------------------------------------------
     // MARK: - Validate Format
     // ------------------------------------------------------------
     func isValid() -> Bool {
+        let eq = strippedEquation()
         let validPattern = #"^[0-9a-zA-Z\^\+\-\*\/\(\)\.]+$"#
-        return equation.range(of: validPattern, options: .regularExpression) != nil
+        return eq.range(of: validPattern, options: .regularExpression) != nil
     }
     
     // ------------------------------------------------------------
@@ -97,7 +94,7 @@ final class MathEngine {
     private func makeSafeExpressionString(_ input: String) -> String? {
         var cleaned = input
         
-        // 1. Remove '='
+        // 1. Remove '=' just in case
         cleaned = cleaned.replacingOccurrences(of: "=", with: "")
         
         // 2. Reject comparison operators
@@ -126,14 +123,6 @@ final class MathEngine {
     private func preprocessEquation() -> String {
         var eq = strippedEquation()
         
-        // Remove RHS if present
-        if let idx = eq.firstIndex(of: "=") {
-            eq = String(eq[..<idx])
-        }
-        
-        // Remove harmful characters
-        eq.removeAll { $0 == "\"" || $0 == "|" }
-        
         // Replace coefficients a,b,c etc
         for (symbol, value) in coefficients {
             let pattern = "(?<![a-zA-Z])\(symbol)(?![a-zA-Z])"
@@ -145,24 +134,16 @@ final class MathEngine {
         // Convert ^ → pow()
         let powerPattern = #"([a-zA-Z0-9\)\(]+)\^([a-zA-Z0-9\)\(]+)"#
         let regex = try! NSRegularExpression(pattern: powerPattern)
-        
         while let match = regex.firstMatch(in: eq, range: NSRange(eq.startIndex..., in: eq)) {
             let base = Range(match.range(at: 1), in: eq)!
             let exp  = Range(match.range(at: 2), in: eq)!
-            
             let replacement = "pow(\(eq[base]),\(eq[exp]))"
             eq.replaceSubrange(base.lowerBound..<exp.upperBound, with: replacement)
         }
         
-        // 2x -> 2*x
-        eq = eq.replacingOccurrences(of: #"([0-9\)])x"#,
-                                     with: "$1*x",
-                                     options: .regularExpression)
-        
-        // x( -> x*(
-        eq = eq.replacingOccurrences(of: #"x\("#,
-                                     with: "x*(",
-                                     options: .regularExpression)
+        // 2x -> 2*x, x( -> x*(
+        eq = eq.replacingOccurrences(of: #"([0-9\)])x"#, with: "$1*x", options: .regularExpression)
+        eq = eq.replacingOccurrences(of: #"x\("#, with: "x*(", options: .regularExpression)
         
         return eq
     }
@@ -172,7 +153,6 @@ final class MathEngine {
     // ------------------------------------------------------------
     private func xSatisfiesDomain(_ x: Double) -> Bool {
         guard let rule = domainRule else { return true }
-        
         let pattern = #"(-?[0-9\.]+)\s*([<>]=?)\s*x\s*([<>]=?)\s*(-?[0-9\.]+)"#
         if let regex = try? NSRegularExpression(pattern: pattern),
            let match = regex.firstMatch(in: rule, range: NSRange(rule.startIndex..., in: rule)) {
@@ -221,6 +201,7 @@ final class MathEngine {
         for x in stride(from: xRange.lowerBound, through: xRange.upperBound, by: step) {
             if !xSatisfiesDomain(x) { continue }
             
+            // Substitute x
             let substituted = processed.replacingOccurrences(of: "x", with: "(\(x))")
             
             guard let safeExpr = makeSafeExpressionString(substituted) else {
@@ -252,11 +233,9 @@ final class MathEngine {
         
         let points = calculatePoints()
         
-        let pretty = points
-            .map { "(\($0.x), \($0.y))" }
-            .joined(separator: ", ")
-        
+        let pretty = points.map { "(\($0.x), \($0.y))" }.joined(separator: ", ")
         print("[\(pretty)]")
+        
         return points
     }
 }
