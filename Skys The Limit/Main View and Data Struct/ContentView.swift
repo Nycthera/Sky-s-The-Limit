@@ -13,7 +13,7 @@ struct ContentView: View {
             FadeShowView()
         }
       
-        .navigationBarHidden(true)
         .navigationBarBackButtonHidden(true)
+        .navigationViewStyle(.stack)
     }
 }
