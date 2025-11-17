@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct AnimationView: View {
-   @State private var reactionCount: Int = 0
+    @State private var reactionCount: Int = 0
     @State private var showText = false
-
+    
     var body: some View {
         ZStack {
             Image("Space")
@@ -21,7 +21,7 @@ struct AnimationView: View {
                     reactionCount += 1
                     showText = true
                 }
-
+            
             VStack {
                 Image("Meteor")
                     .resizable()
@@ -50,10 +50,10 @@ struct AnimationView: View {
                     .foregroundColor(.white)
                     .opacity(showText ? 1.0 : 0.0) // Fully opaque when showText is true, fully transparent otherwise
                     .animation(.easeInOut, value: showText)
-            
-              
+                
+                
             }
-          
+            
         }
     }
 }
