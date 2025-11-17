@@ -18,15 +18,18 @@ struct EquationListView: View {
             GeometryReader { geometry in
                 
                 HStack(spacing: 15) {
+                    
                     // --- LEFT COLUMN: Equations List ---
                     VStack(spacing: 10) {
                         Text("Equations")
                             .font(.custom("SpaceMono-Bold", size: 24))
                             .foregroundColor(.white)
+                        
                         Text("Target Coordinates")
                             .font(.custom("SpaceMono-Bold", size: 18))
                             .foregroundColor(.yellow)
                             .padding(.bottom, 5)
+                        
                         ForEach(Array(viewModel.stars.enumerated()), id: \.offset) { index, star in
                             Text("Star \(index + 1): (\(Int(star.x)), \(Int(star.y)))")
                                 .font(.custom("SpaceMono-Regular", size: 16))
