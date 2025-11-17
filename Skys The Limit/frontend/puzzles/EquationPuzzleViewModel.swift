@@ -6,7 +6,8 @@
 import Foundation
 import CoreGraphics
 import Combine
-
+import SwiftUI
+ 
 @MainActor
 class EquationPuzzleViewModel: ObservableObject {
     //for the animation of the drawing of the line

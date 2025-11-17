@@ -23,7 +23,8 @@ func post_to_database(equations: [String]) async {
             rowId: ID.unique(),
             data: [
                 "userid": deviceID,
-                "equations": equations
+                "equations": equations,
+                "isShared": false
             ],
             permissions: [
                 Permission.read(Role.any()),

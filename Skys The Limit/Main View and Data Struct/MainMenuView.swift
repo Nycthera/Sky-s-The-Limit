@@ -7,6 +7,9 @@ struct MainMenuView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .edgesIgnoringSafeArea(.all)
+            Image("Meteor")
+                .resizable()
+                .frame(width: 1000, height: 1000)
 
             VStack(spacing: 30) {
                 Text("Let's start!")
@@ -33,7 +36,7 @@ struct MainMenuView: View {
                 }
                 .font(.custom("SpaceMono-Regular", size: 35))
                 .foregroundColor(.white)
-                
+                 
                 Spacer()
             }
         }

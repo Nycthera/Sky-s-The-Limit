@@ -14,7 +14,7 @@ struct EquationListView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .edgesIgnoringSafeArea(.all)
-
+            
             GeometryReader { geometry in
                 HStack(spacing: 0) {
                     SidebarView(
@@ -23,7 +23,7 @@ struct EquationListView: View {
                         stars: viewModel.stars,
                         successfulEquations: viewModel.successfulEquations
                     )
-
+                    
                     GameAreaView(
                         viewModel: viewModel,
                         currentMathString: $currentMathString,
@@ -49,7 +49,7 @@ struct EquationListView: View {
                     }
                 }
             }
-
+            
             if viewModel.isPuzzleComplete {
                 VStack {
                     Text("You Win!")
@@ -59,6 +59,13 @@ struct EquationListView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.black.opacity(0.7))
+            }
+        }
+        .onChange(of: viewModel.isPuzzleComplete) { isComplete in
+            if isComplete {
+                Task {
+                    try? await post_to_database(equations: equationStore.equations)
+                }
             }
         }
         .animation(.default, value: viewModel.isPuzzleComplete)
@@ -137,12 +144,12 @@ private struct GameAreaView: View {
         VStack(spacing: 15) {
             if !viewModel.isPuzzleComplete &&
                 viewModel.stars.count > viewModel.currentTargetIndex + 1 {
-
+                
                 Text("Connect Star \(viewModel.currentTargetIndex + 1) → Star \(viewModel.currentTargetIndex + 2)")
                     .font(.custom("SpaceMono-Regular", size: 20))
                     .foregroundColor(.yellow)
             }
-
+            
             GraphCanvasView(
                 stars: viewModel.stars,
                 successfulLines: viewModel.successfulLines,
@@ -151,7 +158,7 @@ private struct GameAreaView: View {
                 connectedStarIndices: viewModel.connectedStarIndices
             )
             .frame(height: canvasHeight)
-
+            
             MathView(
                 equation: viewModel.currentLatexString,
                 fontSize: 22
@@ -159,23 +166,25 @@ private struct GameAreaView: View {
             .frame(maxWidth: .infinity, minHeight: 10, maxHeight: 20)
             .background(Color.black.opacity(0.5))
             .cornerRadius(12)
-
+            
             MathKeyboardView(
                 latexString: $viewModel.currentLatexString,
                 mathString: $currentMathString
             )
-
-            Button("Check Line") {
+            
+            Button{
                 viewModel.checkCurrentLineSolution()
                 viewModel.updateUserGraph()
+            } label:{
+                Text("Check Line")
+                .font(.custom("SpaceMono-Regular", size: 20))
+                .padding(.vertical, 15)
+                .frame(maxWidth: .infinity)
+                .background(Color.white)
+                .foregroundColor(.black)
+                .cornerRadius(15)
+                .disabled(viewModel.isPuzzleComplete)
             }
-            .font(.custom("SpaceMono-Regular", size: 20))
-            .padding(.vertical, 15)
-            .frame(maxWidth: .infinity)
-            .background(Color.white)
-            .foregroundColor(.black)
-            .cornerRadius(15)
-            .disabled(viewModel.isPuzzleComplete)
         }
     }
 }
