@@ -96,13 +96,13 @@ struct EquationListView: View {
                             currentLine: viewModel.currentGraphPoints,
                             currentTargetIndex: viewModel.currentTargetIndex
                         )
-                        .frame(height: geometry.size.height * 0.40)
+                        .frame(height: geometry.size.height * 0.18)
 
                         MathView(
                             equation: viewModel.currentLatexString,
                             fontSize: 22
                         )
-                        .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 80)
+                        .frame(maxWidth: .infinity, minHeight: 10, maxHeight: 20)
                         .background(Color.black.opacity(0.5))
                         .cornerRadius(12)
 
@@ -122,7 +122,7 @@ struct EquationListView: View {
                         .cornerRadius(15)
                         .disabled(viewModel.isPuzzleComplete)
 
-                        Spacer()
+                        //Spacer()
                     }
                     .padding()
                 }
