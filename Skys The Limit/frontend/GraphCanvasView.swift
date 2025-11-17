@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct GraphCanvasView: View {
+    //guys this is for the animation drawing 
+    @State private var animationProgress: Double = 1.0
+    
     let stars: [CGPoint]
     let successfulLines: [[(x: Double, y: Double)]]
     let currentLine: [(x: Double, y: Double)]

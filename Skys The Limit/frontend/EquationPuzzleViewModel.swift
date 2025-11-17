@@ -1,3 +1,8 @@
+// What this file does: It stores the game state (stars, lines, equations).
+//It checks if the user entered the correct equation.
+//It updates the line preview while the user types.
+//It decides when the puzzle is solved.
+                
 import Foundation
 import CoreGraphics
 import Combine
