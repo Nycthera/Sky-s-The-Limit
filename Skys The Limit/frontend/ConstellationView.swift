@@ -42,9 +42,9 @@ struct ConstellationView: View {
     }
 }
 
-#Preview {
-    NavigationView {
-        ConstellationView()
-            .environmentObject(EquationStore())
-    }
-}
+//#Preview {
+//    NavigationView {
+//        ConstellationView()
+//            .environmentObject(EquationStore())
+//    }
+//}
