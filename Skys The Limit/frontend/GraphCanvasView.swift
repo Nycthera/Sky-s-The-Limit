@@ -41,14 +41,32 @@ struct GraphCanvasView: View {
                 context.stroke(axes, with: .color(.white.opacity(0.7)), lineWidth: 2)
 
                 // --- Layer 2: Completed lines ---
-                for line in successfulLines {
+                for (lineIndex, line) in successfulLines.enumerated() {
                     guard let first = line.first else { continue }
-                    var path = Path()
-                    path.move(to: scalePoint(first, xScale, yScale))
-                    for point in line.dropFirst() {
-                        path.addLine(to: scalePoint(point, xScale, yScale))
+
+                    // Determine which two stars this line connects
+                    let starA = stars[lineIndex]
+                    let starB = stars[lineIndex + 1]
+
+                    let minX = min(starA.x, starB.x)
+                    let maxX = max(starA.x, starB.x)
+                    let minY = min(starA.y, starB.y)
+                    let maxY = max(starA.y, starB.y)
+
+                    let filteredLine = line.filter { point in
+                        (minX...maxX).contains(point.x) && (minY...maxY).contains(point.y)
                     }
-                    context.stroke(path, with: .color(.cyan), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+
+                    if !filteredLine.isEmpty {
+                        var path = Path()
+                        path.move(to: scalePoint(filteredLine.first!, xScale, yScale))
+                        for point in filteredLine.dropFirst() {
+                            path.addLine(to: scalePoint(point, xScale, yScale))
+                        }
+                        context.stroke(path,
+                                       with: .color(.cyan),
+                                       style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                    }
                 }
 
                 // --- Layer 3: Current preview line ---
