@@ -53,8 +53,8 @@ struct MathKeyboardView: View {
         ],
         [
 //            MathKey(display: "a/b", mathValue: "(", type: .character),  // placeholder for display
-            MathKey(display: "x²", mathValue: "^2", type: .character),
-            MathKey(display: "√", mathValue: "sqrt(", type: .character),
+//            MathKey(display: "x²", mathValue: "^2", type: .character),
+//            MathKey(display: "√", mathValue: "sqrt(", type: .character),
             MathKey(display: "⌫", mathValue: "", type: .backspace),
             MathKey(display: "=", mathValue: "=", type: .character),
             MathKey(display: "+", mathValue: "+", type: .character),

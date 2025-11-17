@@ -12,6 +12,8 @@ struct GraphCanvasView: View {
     
    
     @State private var selectedStarCoordinates: String? = nil
+    @State private var selectedStarIndex: Int? = nil
+
     
     let stars: [CGPoint]
     let successfulLines: [[(x: Double, y: Double)]]
@@ -87,30 +89,71 @@ struct GraphCanvasView: View {
             .cornerRadius(12)
             
             
+//            GeometryReader { geo in
+//                let xScale = geo.size.width / CGFloat(xRange.upperBound - xRange.lowerBound)
+//                let yScale = geo.size.height / CGFloat(yRange.upperBound - yRange.lowerBound)
+//                
+//                ForEach(Array(stars.enumerated()), id: \.offset) { index, star in
+//                    let p = scalePoint((Double(star.x), Double(star.y)), xScale, yScale)
+//                    
+//                    Button(action: {
+//                        print("Star \(index + 1): (\(star.x), \(star.y))")
+//                    
+//                    }) {
+//                        Circle()
+//                            .fill(
+//                                connectedStarIndices.contains(index) ? Color.blue :
+//                                    (index == currentTargetIndex || index == currentTargetIndex + 1 ? Color.yellow : Color.white.opacity(0.7))
+//                            )
+//                            .frame(width: 10, height: 10)
+//                    }
+//                    .position(x: p.x + geo.size.width / 2, y: p.y + geo.size.height / 2)
+//                    
+//                    // show coordinates
+//                    
+//                }
+//            }
+            
             GeometryReader { geo in
+                
                 let xScale = geo.size.width / CGFloat(xRange.upperBound - xRange.lowerBound)
                 let yScale = geo.size.height / CGFloat(yRange.upperBound - yRange.lowerBound)
                 
                 ForEach(Array(stars.enumerated()), id: \.offset) { index, star in
                     let p = scalePoint((Double(star.x), Double(star.y)), xScale, yScale)
+                    let screenX = p.x + geo.size.width / 2
+                    let screenY = p.y + geo.size.height / 2
                     
-                    Button(action: {
-                        print("Star \(index + 1): (\(star.x), \(star.y))")
-                    
-                    }) {
-                        Circle()
-                            .fill(
-                                connectedStarIndices.contains(index) ? Color.blue :
-                                    (index == currentTargetIndex || index == currentTargetIndex + 1 ? Color.yellow : Color.white.opacity(0.7))
-                            )
-                            .frame(width: 10, height: 10)
+                    ZStack {
+                        // Star button
+                        Button(action: {
+                            selectedStarIndex = index   // <-- SAVE WHICH STAR WAS TAPPED
+                        }) {
+                            Circle()
+                                .fill(
+                                    connectedStarIndices.contains(index) ? Color.blue :
+                                    (index == currentTargetIndex || index == currentTargetIndex + 1
+                                     ? Color.yellow
+                                     : Color.white.opacity(0.7))
+                                )
+                                .frame(width: 10, height: 10)
+                        }
+                        
+                        // --- Coordinate label for THIS star only ---
+                        if selectedStarIndex == index {
+                            Text("(\(Int(star.x)), \(Int(star.y)))")
+                                .font(.caption)
+                                .foregroundColor(.white)
+                                .padding(4)
+                                .background(Color.black.opacity(0.7))
+                                .cornerRadius(6)
+                                .offset(y: -25)   // <-- Moves the label ABOVE the star
+                        }
                     }
-                    .position(x: p.x + geo.size.width / 2, y: p.y + geo.size.height / 2)
-                    
-                    // show coordinates
-                    
+                    .position(x: screenX, y: screenY)
                 }
             }
+
         }
     }
     
