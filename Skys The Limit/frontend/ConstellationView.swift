@@ -6,7 +6,7 @@ struct ConstellationView: View {
 
     var body: some View {
         ZStack {
-            Image("background")
+            Image("Space")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .edgesIgnoringSafeArea(.all)

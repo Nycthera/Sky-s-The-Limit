@@ -55,7 +55,7 @@ struct EquationListView: View {
                     .padding()
                     .background(Color.black.opacity(0.4))
                     .cornerRadius(15)
-                    .frame(width: geometry.size.width * 0.35) // Fixed width for left column
+                    // .frame(width: geometry.size.width * 0.35) // Fixed width for left column
                     
                     // --- RIGHT COLUMN: Interactive Area ---
                     VStack(spacing: 15) {
@@ -91,6 +91,7 @@ struct EquationListView: View {
                             // TODO: Initialize MathEngine with a proper equation string, not the store
                             // Use currentMathString for evaluation
                             viewModel.checkCurrentLineSolution()
+                            print("check line button pressed")
                             
                         }
                         .font(.custom("SpaceMono-Regular", size: 20))
@@ -110,7 +111,7 @@ struct EquationListView: View {
             // "You Win!" overlay
             if viewModel.isPuzzleComplete {
                 VStack {
-                    Text("🎉 You Win! 🎉")
+                    Text("You Win!")
                         .font(.custom("SpaceMono-Bold", size: 36))
                         .foregroundColor(.yellow)
                         .shadow(radius: 5)
