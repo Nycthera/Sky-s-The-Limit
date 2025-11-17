@@ -13,6 +13,8 @@ class EquationPuzzleViewModel: ObservableObject {
     @Published var stars: [CGPoint] = []
     @Published var successfulLines: [[(x: Double, y: Double)]] = []
     @Published var successfulEquations: [String] = []
+    //guys this is to differentiate the first second and completed stars
+    @Published var connectedStarIndices: Set<Int> = []
     
     // The current user input state
     @Published var currentLatexString: String = "y="
@@ -71,8 +73,12 @@ class EquationPuzzleViewModel: ObservableObject {
         if connectsStarA && connectsStarB {
             successfulLines.append(currentGraphPoints)
             successfulEquations.append(currentLatexString)
-            currentTargetIndex += 1
             
+            // Mark first star as connected
+            connectedStarIndices.insert(currentTargetIndex)
+
+            
+            currentTargetIndex += 1
             if currentTargetIndex >= stars.count - 1 {
                 isPuzzleComplete = true
             }

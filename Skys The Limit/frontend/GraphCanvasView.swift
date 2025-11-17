@@ -16,6 +16,7 @@ struct GraphCanvasView: View {
     let successfulLines: [[(x: Double, y: Double)]]
     let currentLine: [(x: Double, y: Double)]
     let currentTargetIndex: Int
+    let connectedStarIndices: Set<Int>
 
     private let xRange: ClosedRange<Double> = -10...10
     private let yRange: ClosedRange<Double> = -10...10
@@ -68,11 +69,16 @@ struct GraphCanvasView: View {
 
                     let starRect = CGRect(x: p.x - 5, y: p.y - 5, width: 10, height: 10)
 
-                    if index == currentTargetIndex || index == currentTargetIndex + 1 {
+                    if connectedStarIndices.contains(index) {
+                        // Star is already connected → blue
+                        context.fill(Path(ellipseIn: starRect), with: .color(.blue))
+                    } else if index == currentTargetIndex || index == currentTargetIndex + 1 {
+                        // Current pair to connect → yellow
                         let highlight = CGRect(x: p.x - 12, y: p.y - 12, width: 24, height: 24)
                         context.stroke(Path(ellipseIn: highlight), with: .color(.yellow.opacity(0.8)), lineWidth: 2)
                         context.fill(Path(ellipseIn: starRect), with: .color(.yellow))
                     } else {
+                        // All other stars → white
                         context.fill(Path(ellipseIn: starRect), with: .color(.white.opacity(0.7)))
                     }
                 }
