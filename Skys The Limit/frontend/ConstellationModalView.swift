@@ -1,0 +1,55 @@
+//
+//  ConstellationModalView.swift
+//  Skys The Limit
+//
+//  Created by Chris  on 19/11/25.
+//
+
+import SwiftUI
+
+struct ConstellationModalView: View {
+    @Binding var name: String
+    @Binding var numberOfStars: String
+    @Binding var isShared: Bool
+    @Environment(\.dismiss) var dismiss
+    let tempEquation = ["1 = 2", "2, 3"]
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Constellation Info")) {
+                    TextField("Constellation Name", text: $name)
+                    TextField("Number of Stars", text: $numberOfStars)
+                        .keyboardType(.numberPad)
+                    Toggle("Shared with others?", isOn: $isShared)
+                }
+            }
+            .navigationTitle("New Constellation")
+            .toolbar {
+                // Cancel button
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Dismiss") {
+                        dismiss()
+                    }
+                }
+                
+                // Done button
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        // Optional: validate input
+                        if !name.isEmpty && !numberOfStars.isEmpty {
+                            // Here you could save the constellation
+                            print("Created: \(name), Stars: \(numberOfStars), Shared: \(isShared)")
+                            Task {
+                                await post_to_database(equations: tempEquation)
+                                print("hi!!!!")
+                            }
+                        }
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
