@@ -65,7 +65,7 @@ struct EquationListView: View {
         .onChange(of: viewModel.isPuzzleComplete) { isComplete in
             if isComplete {
                 Task {
-                    try? await post_to_database(equations: equationStore.equations)
+                    try? await post_to_database(equations: equationStore.equations, name: "hi i wanna die")
                 }
             }
         }

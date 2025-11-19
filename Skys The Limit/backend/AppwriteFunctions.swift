@@ -14,7 +14,7 @@ var userTableIDs: [String] = []
 
 
 /// Creates a brand new document for a first-time user.
-func post_to_database(equations: [String]) async {
+func post_to_database(equations: [String], name: String) async {
     print("User has no document. Creating a new one...")
     do {
         let document = try await appwrite.table.createRow(
@@ -24,7 +24,8 @@ func post_to_database(equations: [String]) async {
             data: [
                 "userid": deviceID,
                 "equations": equations,
-                "isShared": false
+                "isShared": false,
+                "name": name
             ],
             permissions: [
                 Permission.read(Role.any()),
@@ -66,26 +67,18 @@ func list_document_for_user() async {
 }
 
 
-/// Updates the user's first document with a new list of equations.
-/// If no document exists, it calls `post_to_database` to create one.
-func update_document_for_user(equations: [String]) async {
-    // Ensure we have a document ID to update.
-    guard let docIdToUpdate = userTableIDs.first else {
-        print("Update failed: No document ID found for the user. Attempting to create one.")
-        // If no document exists, we should create one instead.
-        await post_to_database(equations: equations)
-        return
-    }
-    
-    print("Updating document: \(docIdToUpdate)...")
+/// Updates a document with a new list of equations and name, using a specific row/document ID.
+/// If the document doesn't exist, it creates a new one.
+func update_document(rowId: String, equations: [String], name: String) async {
+    print("Updating document with ID: \(rowId)...")
     do {
         _ = try await appwrite.table.updateRow(
             databaseId: databaseID,
             tableId: tableID,
-            rowId: docIdToUpdate,
+            rowId: rowId,
             data: [
-                "userid": deviceID,
-                "equations": equations
+                "equations": equations,
+                "name": name
             ],
             permissions: [Permission.read(Role.any())]
         )
@@ -142,47 +135,60 @@ func get_shared_document(rowId: String) async {
 
 /// Fetches the first document belonging to the current user
 /// and prints/returns its contents.
-func get_document_for_user() async {
-    // Ensure there is at least one document ID stored.
-    guard let docId = userTableIDs.first else {
-        print("No document ID found. Call list_document_for_user() first.")
-        return
-    }
-    
-    print("Fetching document with ID: \(docId)")
-    
+struct Constellation: Identifiable {
+    let id: String
+    let userId: String
+    let name: String
+    let equations: [String]
+    let isShared: Bool
+}
+
+
+func get_document_for_user(rowId: String) async -> Constellation? {
     do {
         let document = try await appwrite.table.getRow(
             databaseId: databaseID,
             tableId: tableID,
-            rowId: docId
+            rowId: rowId
         )
+        
+        let userId = (document.data["userid"] as? AnyCodable)?.value as? String ?? "unknown"
+        let isShared = (document.data["isShared"] as? AnyCodable)?.value as? Bool ?? false
+        let name = (document.data["name"] as? AnyCodable)?.value as? String ?? "Untitled"
+        print(name) // "Why" or "Untitled" if nil
 
-        // Print the entire document (debug)
-        print("Document fetched successfully: \(document)")
-
-        // Safely extract specific fields from AnyCodable payloads
-        if let anyUserId = document.data["userid"],
-           let userid = (anyUserId as? AnyCodable)?.value as? String {
-            print("User ID: \(userid)")
-        } else {
-            print("User ID not found or not a String")
-        }
-
-        if let anyEquations = document.data["equations"],
-           let equationsValue = (anyEquations as? AnyCodable)?.value {
-            if let equations = equationsValue as? [String] {
-                print("Equations: \(equations)")
-            } else if let single = equationsValue as? String {
-                print("Equations (single string): [\(single)]")
-            } else {
-                print("Equations not found or not a [String]")
+        
+        var equations: [String] = []
+        if let anyEquations = document.data["equations"] as? AnyCodable {
+            if let arr = anyEquations.value as? [String] {
+                equations = arr
+            } else if let single = anyEquations.value as? String {
+                equations = [single]
             }
-        } else {
-            print("Equations key not present in document data")
         }
+        
+        return Constellation(
+            id: document.id,
+            userId: userId,
+            name: name,
+            equations: equations,
+            isShared: isShared
+        )
 
     } catch {
         print("Error fetching document: \(error.localizedDescription)")
+        return nil
     }
+}
+
+
+
+
+func checkIfUserHasDocument() async -> Bool {
+    await list_document_for_user()   // updates userTableIDs
+    
+    print("Response from checkIfUserHasDocument(): \(userTableIDs)")
+    
+    // Return true if NO documents, false if documents exist
+    return userTableIDs.isEmpty
 }

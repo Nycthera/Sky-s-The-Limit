@@ -36,17 +36,18 @@ struct ConstellationModalView: View {
                 // Done button
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
-                        // Optional: validate input
-                        if !name.isEmpty && !numberOfStars.isEmpty {
-                            // Here you could save the constellation
-                            print("Created: \(name), Stars: \(numberOfStars), Shared: \(isShared)")
-                            Task {
-                                await post_to_database(equations: tempEquation)
-                                print("hi!!!!")
-                            }
+                        guard !name.isEmpty && numberOfStars != nil else { return }
+                        
+                        print("Created: \(name), Stars: \(numberOfStars), Shared: \(isShared)")
+                        
+                        Task {
+                            let userHasNoDocument = await checkIfUserHasDocument()
+                            await post_to_database(equations: tempEquation, name: name)
+
+                            dismiss()
                         }
-                        dismiss()
                     }
+
                 }
             }
         }
