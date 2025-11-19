@@ -17,7 +17,7 @@ struct MainMenuView: View {
                     .foregroundColor(.white)
                     .padding(.top, 50)
 
-                Image("Meteor")
+                Image("Meteor2")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 150, height: 150)

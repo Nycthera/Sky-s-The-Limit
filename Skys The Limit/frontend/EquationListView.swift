@@ -63,46 +63,49 @@ struct EquationListView: View {
             }
             
             if viewModel.isPuzzleComplete {
-                VStack {
-                    ZStack {
-                        ConfettiView(isAnimating: $isCelebrating)
-                        VStack {
-                            Spacer()
-                            Text("You Win!")
-                                .font(.custom("SpaceMono-Bold", size: 50))
-                                .foregroundColor(.yellow)
-                                .shadow(radius: 5)
-                            Spacer()
-                        }
-                        
+                ZStack {
+                    // CONFETTI LAYER — full screen
+                    ConfettiView(isAnimating: $isCelebrating)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .allowsHitTesting(false)
+                        .zIndex(10)
+
+                    // WIN TEXT & TAP HANDLER
+                    VStack {
+                        Spacer()
+                        Text("You Win!")
+                            .font(.custom("SpaceMono-Bold", size: 50))
+                            .foregroundColor(.yellow)
+                            .shadow(radius: 5)
+                        Spacer()
                     }
-                    .contentShape(Rectangle())        // allows the ZStack to detect taps
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .contentShape(Rectangle())
                     .onTapGesture {
+                        // stop confetti
                         isCelebrating = false
-                        goHome = true                 // 👈 go back to main menu
+                        // navigate home
+                        goHome = true
                     }
+                    .zIndex(20)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .onChange(of: viewModel.isPuzzleComplete) { isComplete in
-                    if isComplete {
+                .background(Color.black.opacity(0.5))  // ensures ZStack fills space
+                .onAppear {
+                    // 🎉 START CONFETTI AT THE RIGHT TIME
+                    DispatchQueue.main.async {
                         isCelebrating = true
-                        
-                        Task {
-                            try? await post_to_database(equations: equationStore.equations)
-                        }
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                            isCelebrating = false
-                        }
                     }
                 }
-                .animation(.default, value: viewModel.isPuzzleComplete)
-                .animation(.default, value: viewModel.currentTargetIndex)
-                .navigationTitle("Draw The Stars")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbarColorScheme(.dark, for: .navigationBar)
-                .navigationBarBackButtonHidden(false)
+
+                // Invisible nav trigger
+                NavigationLink(destination: MainMenuView(),
+                               isActive: $goHome) {
+                    EmptyView()
+                }
+                .hidden()
             }
+
             
         }
     }

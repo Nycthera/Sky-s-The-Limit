@@ -29,7 +29,7 @@ struct AnimationView: View {
             
             VStack {
                 Spacer()
-                Image("Meteor")
+                Image("Meteor2")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: 35))
@@ -41,13 +41,13 @@ struct AnimationView: View {
                             .offset(y: value.verticalTranslation)
                     } keyframes: { _ in
                         KeyframeTrack(\.scale){
-                            SpringKeyframe(2.5, duration: 1.2, spring: .bouncy)
+                            SpringKeyframe(1.0, duration: 1.2, spring: .bouncy)
                         }
                         KeyframeTrack(\.verticalTranslation){
                             LinearKeyframe(200.0, duration: 0.2)
                         }
                         KeyframeTrack(\.horizontalTranslation){
-                            LinearKeyframe(-300.0, duration: 0.2)
+                            LinearKeyframe(100.0, duration: 0.2)
                         }
                     }
                 Spacer()
