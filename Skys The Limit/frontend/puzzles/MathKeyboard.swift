@@ -1,14 +1,7 @@
-//
-//  MathKeyboardView.swift
-//  Skys The Limit
-//
-//  Created by Nhavin Thirukkumaran on 7/11/25.
-//
-
 import SwiftUI
 
 // MARK: - Key Types
-enum KeyType: Hashable {
+enum KeyType {
     case character
     case backspace
 }
@@ -16,26 +9,24 @@ enum KeyType: Hashable {
 // MARK: - Math Key
 struct MathKey: Identifiable, Hashable {
     let id = UUID()
-    let display: String   // What the user sees on the button (LaTeX or symbol)
-    let mathValue: String // Safe string for MathEngine evaluation
+    let display: String   // What is shown on the button
+    let mathValue: String // Used in MathEngine
     let type: KeyType
+    // removed `width: GridItem.Size` because GridItem.Size is NOT Hashable
 }
 
-// MARK: - Keyboard View
+// MARK: - Math Keyboard View
 struct MathKeyboardView: View {
-    // Displayed LaTeX string (UI)
+
     @Binding var latexString: String
-    // Safe math string (for NSExpression / MathEngine)
     @Binding var mathString: String
 
-    // Keyboard layout
-    let keyboardLayout: [[MathKey]] = [
+    // MARK: - Keyboard Layout
+    private let keyboardRows: [[MathKey]] = [
         [
             MathKey(display: "1", mathValue: "1", type: .character),
             MathKey(display: "2", mathValue: "2", type: .character),
-            MathKey(display: "3", mathValue: "3", type: .character),
-//            MathKey(display: "(", mathValue: "(", type: .character),
-//            MathKey(display: ")", mathValue: ")", type: .character)
+            MathKey(display: "3", mathValue: "3", type: .character)
         ],
         [
             MathKey(display: "4", mathValue: "4", type: .character),
@@ -49,69 +40,67 @@ struct MathKeyboardView: View {
             MathKey(display: "8", mathValue: "8", type: .character),
             MathKey(display: "9", mathValue: "9", type: .character),
             MathKey(display: "0", mathValue: "0", type: .character),
-            MathKey(display: ".", mathValue: ",", type: .character)
+            MathKey(display: ".", mathValue: ".", type: .character),
+            MathKey(display: "/", mathValue: "/", type: .character)
         ],
         [
-//            MathKey(display: "a/b", mathValue: "(", type: .character),  // placeholder for display
-//            MathKey(display: "x²", mathValue: "^2", type: .character),
-//            MathKey(display: "√", mathValue: "sqrt(", type: .character),
+            MathKey(display: "x²", mathValue: "^2", type: .character),
+            MathKey(display: "√", mathValue: "sqrt(", type: .character),
             MathKey(display: "⌫", mathValue: "", type: .backspace),
-            MathKey(display: "=", mathValue: "=", type: .character),
             MathKey(display: "+", mathValue: "+", type: .character),
-            MathKey(display: "-", mathValue: "-", type: .character)
+            MathKey(display: "-", mathValue: "-", type: .character),
+            MathKey(display: "=", mathValue: "=", type: .character)
         ]
     ]
 
+    // MARK: - Body
     var body: some View {
-        VStack(spacing: 10) {
-            ForEach(keyboardLayout, id: \.self) { row in
-                HStack(spacing: 5) {
+        VStack(spacing: 12) {
+            ForEach(keyboardRows, id: \.self) { row in
+                HStack(spacing: 8) {
                     ForEach(row) { key in
-                        Button {
-                            handleKeyPress(key)
-                        } label: {
-                            Text(key.display)
-                                .font(.system(size: 20, weight: .medium))
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(
-                                    key.type == .backspace
-                                        ? Color.red.opacity(0.7)
-                                        : Color.gray.opacity(0.25)
-                                )
-                                .cornerRadius(8)
+                        Button(action: { handleKeyPress(key) }) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(key.type == .backspace
+                                          ? Color.red.opacity(0.75)
+                                          : Color.white.opacity(0.12))
+                                    .shadow(color: Color.black.opacity(0.25), radius: 2, x: 0, y: 1)
+
+                                Text(key.display)
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.white)
+                            }
+                            .frame(height: 52)
+                            .accessibilityLabel(accessibilityLabel(for: key))
                         }
                     }
                 }
             }
         }
+        .padding(12)
+        .background(.ultraThinMaterial)
+        .cornerRadius(18)
         .padding(.horizontal, 10)
-        .padding(.bottom, 10)
-        .background(Color.black.opacity(0.3))
-        .cornerRadius(15)
-        .frame(height: 240)
     }
 
-    // MARK: - Key Handling
+    // MARK: - Key Press Logic
     private func handleKeyPress(_ key: MathKey) {
         switch key.type {
         case .character:
-            // Append display for LaTeX
             latexString += key.display
-            
-            // Append safe math string for evaluation
             mathString += key.mathValue
 
         case .backspace:
-            // Remove last character from LaTeX display
-            if !latexString.isEmpty {
-                latexString.removeLast()
-            }
-            // Remove last character from math string safely
-            if !mathString.isEmpty {
-                mathString.removeLast()
-            }
+            if !latexString.isEmpty { latexString.removeLast() }
+            if !mathString.isEmpty { mathString.removeLast() }
+        }
+    }
+
+    private func accessibilityLabel(for key: MathKey) -> String {
+        switch key.type {
+        case .backspace: return "Backspace"
+        case .character: return key.display
         }
     }
 }
-
