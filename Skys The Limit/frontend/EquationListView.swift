@@ -62,54 +62,47 @@ struct EquationListView: View {
                 }
             }
             
-            ZStack {
-                NavigationLink(destination: MainMenuView(), isActive: $goHome) {
-                    EmptyView()
-                }
-                .hidden()
-
-                // your background, sidebar, canvas etc...
-
-                if viewModel.isPuzzleComplete {
-                    VStack {
-                        ZStack {
-                            ConfettiView(isAnimating: $isCelebrating)
-
-                            VStack {
-                                Spacer()
-                                Text("You Win!")
-                                    .font(.custom("SpaceMono-Bold", size: 50))
-                                    .foregroundColor(.yellow)
-                                    .shadow(radius: 5)
-                                Spacer()
-                            }
-                            .background(Color.black.opacity(0.5))
-                            .frame(maxWidth: .infinity, minHeight: 10, maxHeight: 20)
+            if viewModel.isPuzzleComplete {
+                VStack {
+                    ZStack {
+                        ConfettiView(isAnimating: $isCelebrating)
+                        VStack {
+                            Spacer()
+                            Text("You Win!")
+                                .font(.custom("SpaceMono-Bold", size: 50))
+                                .foregroundColor(.yellow)
+                                .shadow(radius: 5)
+                            Spacer()
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            goHome = true
-                        }
+                        
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                }
-            }
-            .onChange(of: viewModel.isPuzzleComplete) { isComplete in
-                if isComplete {
-                    isCelebrating = true
-                    
-                    Task {
-                        try? await post_to_database(equations: equationStore.equations)
-                    }
-                    
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    .contentShape(Rectangle())        // allows the ZStack to detect taps
+                    .onTapGesture {
                         isCelebrating = false
+                        goHome = true                 // 👈 go back to main menu
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onChange(of: viewModel.isPuzzleComplete) { isComplete in
+                    if isComplete {
+                        isCelebrating = true
+                        
+                        Task {
+                            try? await post_to_database(equations: equationStore.equations)
+                        }
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                            isCelebrating = false
+                        }
+                    }
+                }
+                .animation(.default, value: viewModel.isPuzzleComplete)
+                .animation(.default, value: viewModel.currentTargetIndex)
+                .navigationTitle("Draw The Stars")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarColorScheme(.dark, for: .navigationBar)
+                .navigationBarBackButtonHidden(false)
             }
-            .animation(.default, value: viewModel.isPuzzleComplete)
-            .navigationTitle("Draw The Stars")
-
             
         }
     }

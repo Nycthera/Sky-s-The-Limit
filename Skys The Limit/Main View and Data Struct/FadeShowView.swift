@@ -16,7 +16,7 @@ struct FadeShowView: View {
             AnimationView()
                 .opacity(opacityA)
 
-            MainTabView()
+            MainMenuView()
                 .opacity(opacityB)
         }
         .onTapGesture {
