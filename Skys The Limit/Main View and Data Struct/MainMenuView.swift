@@ -5,18 +5,8 @@ struct MainMenuView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            Image("Space")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .edgesIgnoringSafeArea(.all)
-            Image("Meteor")
-                .resizable()
-                .frame(width: 1000, height: 1000)
-                .alignmentGuide(.top, computeValue: { viewDimensions in
-                    let defaultTop = viewDimensions[.top]
-                    let newTop = defaultTop - 420
-                    return newTop
-                })
+
+            GalaxyBackground()
 
             VStack(spacing: 30) {
                 Text("Let's start!")
