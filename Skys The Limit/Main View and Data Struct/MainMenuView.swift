@@ -6,7 +6,10 @@ struct MainMenuView: View {
     var body: some View {
         ZStack(alignment: .top) {
 
-            GalaxyBackground()
+            Image("Space")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .edgesIgnoringSafeArea(.all)
 
             VStack(spacing: 30) {
                 Text("Let's start!")
