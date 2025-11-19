@@ -56,19 +56,36 @@ struct EquationListView: View {
             
             if viewModel.isPuzzleComplete {
                 VStack {
-                    Text("You Win!")
-                        .font(.custom("SpaceMono-Bold", size: 36))
-                        .foregroundColor(.yellow)
-                        .shadow(radius: 5)
+                    ZStack {
+                        ConfettiView(isAnimating: $isCelebrating)
+                        VStack {
+                            Spacer()
+                            Text("You Win!")
+                                .font(.custom("SpaceMono-Bold", size: 40))
+                                .foregroundColor(.yellow)
+                                .shadow(radius: 5)
+                            Spacer()
+                        }
+                    }
+                    .onTapGesture {
+                        isCelebrating = false
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.black.opacity(0.7))
             }
         }
         //“When isPuzzleComplete changes, check if it became true. If yes, upload the equations to the database.”
         .onChange(of: viewModel.isPuzzleComplete) { isComplete in
             if isComplete {
+                isCelebrating = true
+
                 Task {
                     try? await post_to_database(equations: equationStore.equations)
+                }
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                    isCelebrating = false
                 }
             }
         }
