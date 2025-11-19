@@ -31,21 +31,22 @@ struct EquationListView: View {
                     )
                     .padding()
                 }
-                .overlay(alignment: .leading) {
-                    Button(action: {
-                        withAnimation(.easeInOut) {
-                            isSidebarCollapsed.toggle()
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        
+                        Button(action: {
+                            withAnimation(.easeInOut) {
+                                isSidebarCollapsed.toggle()
+                            }
+                        }) {
+                            Image(systemName: isSidebarCollapsed
+                                  ? "sidebar.left"
+                                  : "sidebar.left")
+                            .font(.system(size: 30))
+                            .padding(5)
+                            .clipShape(Circle())
+                            .padding(.leading, 6)
                         }
-                    }) {
-                        Image(systemName: isSidebarCollapsed
-                              ? "arrow.right.circle.fill"
-                              : "arrow.left.circle.fill")
-                        .font(.system(size: 30))
-                        .foregroundColor(.yellow)
-                        .padding(10)
-                        .background(Color.black.opacity(0.6))
-                        .clipShape(Circle())
-                        .padding(.leading, 6)
                     }
                 }
             }
@@ -73,7 +74,7 @@ struct EquationListView: View {
         .onChange(of: viewModel.currentLatexString) { _ in
             print("somt heere")
         }
-        .navigationTitle("Draw The Stars")
+//        .navigationTitle("Draw The Stars")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .navigationBarBackButtonHidden(false)
@@ -172,14 +173,15 @@ private struct GameAreaView: View {
                 mathString: $currentMathString
             )
             
-            Button{
+            Button {
                 viewModel.checkCurrentLineSolution()
                 viewModel.updateUserGraph()
             } label:{
                 Text("Check Line")
                 .font(.custom("SpaceMono-Regular", size: 20))
+                .frame(maxWidth: .infinity, minHeight: 10, maxHeight: 20)
                 .padding(.vertical, 15)
-                .frame(maxWidth: .infinity)
+                .padding(.bottom, 50)
                 .background(Color.white)
                 .foregroundColor(.black)
                 .cornerRadius(15)
