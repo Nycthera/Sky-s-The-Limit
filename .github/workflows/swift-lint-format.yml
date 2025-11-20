@@ -15,16 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Homebrew
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $GITHUB_ENV
-          eval "$(/opt/homebrew/bin/brew shellenv)"
-
       - name: Install SwiftLint and SwiftFormat
         run: |
-          brew install swiftlint
-          brew install swiftformat
+          brew install swiftlint || echo "SwiftLint already installed"
+          brew install swiftformat || echo "SwiftFormat already installed"
 
       - name: Run SwiftLint
         run: swiftlint
