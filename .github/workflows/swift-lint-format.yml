@@ -25,7 +25,7 @@ jobs:
 
       # Remove trailing whitespace automatically
       - name: Remove trailing whitespace
-        run: swiftformat . --stripwhitespace
+        run: swiftformat . --trim-whitespace
 
       # Run SwiftLint
       - name: Run SwiftLint
