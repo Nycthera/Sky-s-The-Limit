@@ -11,22 +11,22 @@ on:
 jobs:
   lint-and-format:
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Homebrew
+      # Install Homebrew and tools
+      - name: Install Homebrew, SwiftLint & SwiftFormat
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $GITHUB_ENV
-          eval "$(/opt/homebrew/bin/brew shellenv)"
-
-      - name: Install SwiftLint & SwiftFormat
-        run: |
+          echo 'export PATH="/opt/homebrew/bin:$PATH"' >> $GITHUB_ENV
+          export PATH="/opt/homebrew/bin:$PATH"
           brew install swiftlint swiftformat
 
+      # Remove trailing whitespace automatically
       - name: Remove trailing whitespace
         run: swiftformat . --stripwhitespace
 
+      # Run SwiftLint
       - name: Run SwiftLint
         run: swiftlint
-
