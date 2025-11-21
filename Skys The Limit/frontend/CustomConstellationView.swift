@@ -64,26 +64,7 @@ struct CustomConstellationView: View {
                             )
                             .layoutPriority(1)
 
-                            // Add / Update button
-                            Button {
-                                guard !editingMathString.isEmpty else { return }
-                                if let index = editingIndex {
-                                    arrayOfEquations[index] = editingMathString
-                                } else {
-                                    arrayOfEquations.append(editingMathString)
-                                }
-                                editingLatexString = ""
-                                editingMathString = ""
-                                editingIndex = nil
-                            } label: {
-                                Text(editingIndex != nil ? "Update Equation" : "Add Equation")
-                                    .font(.custom("SpaceMono-Regular", size: 20))
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.white)
-                                    .foregroundColor(.black)
-                                    .cornerRadius(15)
-                            }
+            
 
                             // Current input display
                             VStack(alignment: .leading, spacing: 5) {
