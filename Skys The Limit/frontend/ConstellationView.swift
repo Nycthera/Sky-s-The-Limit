@@ -172,16 +172,10 @@ extension Array {
 
 private struct ConstellationCellView: View {
     let constellation: Constellation
-    // Passed from parent
-    let stars: [CGPoint]
-    let successfulLines: [[(x: Double, y: Double)]]
-    let equations: [String]
-    let ID: String
-    let name: String?   // <-- new optional property
     
     var body: some View {
         VStack(spacing: 12) {
-            Text(name)
+            Text(constellation.name)
                 .font(.title2)
                 .fontWeight(.semibold)
                 .foregroundColor(.white)
