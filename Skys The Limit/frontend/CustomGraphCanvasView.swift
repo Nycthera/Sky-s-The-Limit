@@ -25,6 +25,7 @@ struct CustomGraphCanvasView: View {
     let successfulLines: [[(x: Double, y: Double)]]
     let equations: [String]
     let ID: String
+    let name: String?   // <-- new optional property
     
     // Local states
     @State private var selectedStarCoordinates: String? = nil
@@ -38,7 +39,7 @@ struct CustomGraphCanvasView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                
+
                 // ------------------ Canvas Layer ------------------
                 Canvas { context, size in
                     
@@ -89,6 +90,19 @@ struct CustomGraphCanvasView: View {
                 }
                 .background(Color.black.opacity(0.7))
                 .cornerRadius(12)
+                
+                if let name {
+                        VStack {
+                            Text(name)
+                                .font(.custom("SpaceMono-Bold", size: 24))
+                                .foregroundColor(.yellow)
+                                .shadow(radius: 3)
+                                .padding(.top, 8)
+                            Spacer() // pushes name to top
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .allowsHitTesting(false) // ensures it doesn’t block star taps
+                    }
                 
                 // ------------------ Stars Layer ------------------
                 ForEach(Array(stars.enumerated()), id: \.offset) { index, star in

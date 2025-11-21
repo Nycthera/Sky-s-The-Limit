@@ -15,24 +15,9 @@
 		D9B57B6B2EC0805B00D92C59 /* Skys The Limit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Skys The Limit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		D0244DA72ED03F3D0094FF3F /* Exceptions for "Skys The Limit" folder in "Skys The Limit" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"frontend/Recordings/Recording-1.mov",
-				"frontend/Recordings/Recording-2.mov",
-				"frontend/Recordings/Recording-3.mov",
-			);
-			target = D9B57B6A2EC0805B00D92C59 /* Skys The Limit */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D9B57B6D2EC0805B00D92C59 /* Skys The Limit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				D0244DA72ED03F3D0094FF3F /* Exceptions for "Skys The Limit" folder in "Skys The Limit" target */,
-			);
 			path = "Skys The Limit";
 			sourceTree = "<group>";
 		};

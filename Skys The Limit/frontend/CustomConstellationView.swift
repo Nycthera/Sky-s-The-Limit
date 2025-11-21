@@ -50,7 +50,8 @@ struct CustomConstellationView: View {
                                 stars: stars,
                                 successfulLines: successfulLines,
                                 equations: arrayOfEquations,
-                                ID: ID
+                                ID: ID,
+                                name: "Orion"   // <-- or dynamically fetch from your database
                             )
                             .frame(height: geo.size.height * 0.4)
                             .background(Color.black.opacity(0.2))

@@ -41,36 +41,7 @@ struct ConstellationView: View {
                 }
                 .padding()
             }
-            
-            Button {
-                print("Add pressed")
-                showModal = true
-            } label: {
-                Image(systemName: "plus")
-                    .font(.system(size: 24))
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.black.opacity(0.6))
-                    .clipShape(Circle())
-            }
-            .padding(20)
-            .sheet(isPresented: $showModal) {
-                ConstellationModalView(
-                    name: $constellationName,
-                    numberOfStars: Binding(
-                        get: { numberOfStars.map(String.init) ?? "" },
-                        set: { newValue in
-                            let trimmed = newValue.trimmingCharacters(in: .whitespaces)
-                            if trimmed.isEmpty {
-                                numberOfStars = nil
-                            } else if let intVal = Int(trimmed) {
-                                numberOfStars = intVal
-                            }
-                        }
-                    ),
-                    isShared: $isShared
-                )
-            }
+      
         }
         // <-- Full screen cover to show the selected constellation
         .fullScreenCover(item: $selectedConstellation) { constellation in
@@ -201,10 +172,16 @@ extension Array {
 
 private struct ConstellationCellView: View {
     let constellation: Constellation
-
+    // Passed from parent
+    let stars: [CGPoint]
+    let successfulLines: [[(x: Double, y: Double)]]
+    let equations: [String]
+    let ID: String
+    let name: String?   // <-- new optional property
+    
     var body: some View {
         VStack(spacing: 12) {
-            Text(constellation.name)
+            Text(name)
                 .font(.title2)
                 .fontWeight(.semibold)
                 .foregroundColor(.white)
