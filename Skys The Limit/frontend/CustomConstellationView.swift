@@ -1,9 +1,3 @@
-//
-//  CustomConstellationView.swift
-//  Skys The Limit
-//
-//  Created by Chris on 19/11/25.
-//
 
 import SwiftUI
 import SwiftMath
@@ -24,8 +18,7 @@ struct CustomConstellationView: View {
     let ID: String
     private let sidebarWidth: CGFloat = 250
 
-    var body: some View {
-        NavigationView {
+    var body: some View {     NavigationView {
             GeometryReader { geo in
                 ZStack {
                     // Background
@@ -51,7 +44,7 @@ struct CustomConstellationView: View {
                                 successfulLines: successfulLines,
                                 equations: arrayOfEquations,
                                 ID: ID,
-                                name: "Orion"   // <-- or dynamically fetch from your database
+                                name: "Testing"
                             )
                             .frame(height: geo.size.height * 0.4)
                             .background(Color.black.opacity(0.2))
@@ -65,7 +58,26 @@ struct CustomConstellationView: View {
                             )
                             .layoutPriority(1)
 
-            
+                            // Add / Update button
+                            Button {
+                                guard !editingMathString.isEmpty else { return }
+                                if let index = editingIndex {
+                                    arrayOfEquations[index] = editingMathString
+                                } else {
+                                    arrayOfEquations.append(editingMathString)
+                                }
+                                editingLatexString = ""
+                                editingMathString = ""
+                                editingIndex = nil
+                            } label: {
+                                Text(editingIndex != nil ? "Update Equation" : "Add Equation")
+                                    .font(.custom("SpaceMono-Regular", size: 20))
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.white)
+                                    .foregroundColor(.black)
+                                    .cornerRadius(15)
+                            }
 
                             // Current input display
                             VStack(alignment: .leading, spacing: 5) {
@@ -86,8 +98,7 @@ struct CustomConstellationView: View {
                         }
                         .padding()
                         .frame(width: geo.size.width - (isSidebarCollapsed ? 0 : sidebarWidth))
-                        .frame(maxHeight: .infinity)
-                    }
+                        .frame(maxHeight: .infinity)                     }
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -99,7 +110,7 @@ struct CustomConstellationView: View {
                         Image(systemName: "sidebar.left")
                             .font(.system(size: 25))
                     }
-                }
+    }
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack(spacing: 12) {
@@ -109,8 +120,7 @@ struct CustomConstellationView: View {
                         } label: {
                             Image(systemName: "square.and.arrow.down")
                                 .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(.white)
-                        }
+                                .foregroundColor(.white)     }
 
                         // Back button
                         Button("Back") { presentationMode.wrappedValue.dismiss() }
@@ -121,8 +131,7 @@ struct CustomConstellationView: View {
                             .cornerRadius(8)
                     }
                 }
-            }
-            // Save modal
+            }  // Save modal
             .sheet(isPresented: $showSaveModal) {
                 SaveConstellationModalView(
                     isPresented: $showSaveModal,
@@ -134,8 +143,9 @@ struct CustomConstellationView: View {
                 Task {
                     if let constellation: Constellation = await get_document_for_user(rowId: ID) {
                         self.arrayOfEquations = constellation.equations ?? []
-                    }
-                }
+                        
+                        print(arrayOfEquations)
+                    }   }
             }
             // Auto-update canvas whenever equations change
             .onChange(of: arrayOfEquations) { _ in
@@ -144,72 +154,17 @@ struct CustomConstellationView: View {
         }
         .navigationViewStyle(.stack)
     }
-
     // MARK: - Update stars from equations
     private func updateStarsFromEquations() {
         var allPoints: [(x: Double, y: Double)] = []
-
-        // quick heuristic to decide whether arrayOfEquations contains coordinates or equations:
-        // if most entries contain a comma but no '=' assume coordinates
-        let commaCount = arrayOfEquations.filter { $0.contains(",") }.count
-        let equalsCount = arrayOfEquations.filter { $0.contains("=") }.count
-
-        if commaCount >= equalsCount {
-            // treat as coordinate pairs
-            for eqStr in arrayOfEquations {
-                let components = eqStr.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                if components.count == 2,
-                   let x = Double(components[0]),
-                   let y = Double(components[1]) {
-                    allPoints.append((x: x, y: y))
-                } else {
-                    // try JSON decode like {"x":2,"y":5}
-                    if let data = eqStr.data(using: .utf8),
-                       let obj = try? JSONSerialization.jsonObject(with: data, options: []),
-                       let dict = obj as? [String: Any],
-                       let x = (dict["x"] as? Double) ?? (dict["x"] as? Int).map(Double.init),
-                       let y = (dict["y"] as? Double) ?? (dict["y"] as? Int).map(Double.init) {
-                        allPoints.append((x: x, y: y))
-                    }
-                }
-            }
-            // set stars & lines
-            self.stars = allPoints.map { CGPoint(x: $0.x, y: $0.y) }
-            self.successfulLines = allPoints.chunked(into: 2)
-            print("Loaded legacy coordinate stars:", self.stars)
-            return
-        }
-
-        // Else assume equations — reconstruct intersections between consecutive equations
-        let equations = arrayOfEquations.filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-
-        for i in 0..<(equations.count - 1) {
-            let eqA = equations[i]
-            let eqB = equations[i + 1]
-
-            // coarse search for approximate x
-            if let approxX = findApproxIntersectionX(eq1: eqA, eq2: eqB, xRange: -10...10, step: 0.5) {
-                // refine
-                if let refined = refineIntersection(eq1: eqA, eq2: eqB, initialX: approxX, radius: 1.0, steps: 40) {
-                    allPoints.append((x: refined.x, y: refined.y))
-                    continue
-                }
-            }
-
-            // As fallback: sample eqA and pick first sample point (so something shows)
-            if let first = samplePoints(for: eqA, xRange: -10...10, step: 1.0).first {
-                allPoints.append(first)
-            }
-        }
-
-        // If we reconstructed N intersections, use them as stars.
-        self.stars = allPoints.map { CGPoint(x: $0.x, y: $0.y) }
-        self.successfulLines = allPoints.chunked(into: 2)
-        print("Reconstructed stars from equations:", self.stars)
+        for eq in arrayOfEquations {
+            let engine = MathEngine(equation: eq)
+            let points = engine.evaluate() ?? []
+            allPoints.append(contentsOf: points)    }
+        stars = allPoints.map { CGPoint(x: $0.x, y: $0.y) }
+        successfulLines = allPoints.chunked(into: 2)
     }
-
 }
-    
 // MARK: - Sidebar
 private struct CustomSidebarView: View {
     let isCollapsed: Bool
@@ -279,88 +234,3 @@ private struct CustomSidebarView: View {
         .background(isCollapsed ? Color.clear : Color.black.opacity(0.4))
     }
 }
-
-// MARK: - Helpers copied from ConstellationView so this file compiles
-
-// Sample points from an equation using MathEngine
-private func samplePoints(for equation: String, xRange: ClosedRange<Double> = -10...10, step: Double = 0.5) -> [(x: Double, y: Double)] {
-    let engine = MathEngine(equation: equation)
-    return engine.calculatePoints(xRange: xRange, step: step)
-}
-
-// Find approximate x where two sampled curves are closest (coarse search)
-private func findApproxIntersectionX(eq1: String, eq2: String, xRange: ClosedRange<Double> = -10...10, step: Double = 0.5) -> Double? {
-    let pts1 = samplePoints(for: eq1, xRange: xRange, step: step).sorted { $0.x < $1.x }
-    let pts2 = samplePoints(for: eq2, xRange: xRange, step: step).sorted { $0.x < $1.x }
-    guard !pts1.isEmpty && !pts2.isEmpty else { return nil }
-
-    var bestX: Double? = nil
-    var bestDist = Double.greatestFiniteMagnitude
-
-    for p1 in pts1 {
-        if let p2 = pts2.min(by: { abs($0.x - p1.x) < abs($1.x - p1.x) }) {
-            let d = abs(p1.y - p2.y)
-            if d < bestDist {
-                bestDist = d
-                bestX = (p1.x + p2.x) / 2.0
-            }
-        }
-    }
-    return bestX
-}
-
-// Refine intersection x with a simple search on difference f(x) = y1(x)-y2(x)
-private func refineIntersection(eq1: String, eq2: String, initialX: Double, radius: Double = 1.0, steps: Int = 40) -> (x: Double, y: Double)? {
-    func yAt(_ equation: String, _ x: Double) -> Double? {
-        // Evaluate near a single x by substituting and sampling at that exact x
-        let replaced = equation.replacingOccurrences(of: "x", with: "(\(x))")
-        let engine = MathEngine(equation: replaced)
-        let pts = engine.calculatePoints(xRange: x...x, step: 1.0)
-        return pts.first?.y
-    }
-
-    var left = initialX - radius
-    var right = initialX + radius
-    var bestX = initialX
-    var bestValue = Double.greatestFiniteMagnitude
-
-    for _ in 0..<steps {
-        let mid = (left + right) / 2.0
-        guard let y1 = yAt(eq1, mid), let y2 = yAt(eq2, mid) else { break }
-        let diff = y1 - y2
-        if abs(diff) < abs(bestValue) {
-            bestValue = diff
-            bestX = mid
-        }
-        let leftMid = (left + mid) / 2.0
-        let rightMid = (mid + right) / 2.0
-        let leftDiff = (yAt(eq1, leftMid) ?? Double.greatestFiniteMagnitude) - (yAt(eq2, leftMid) ?? 0)
-        let rightDiff = (yAt(eq1, rightMid) ?? Double.greatestFiniteMagnitude) - (yAt(eq2, rightMid) ?? 0)
-
-        if abs(leftDiff) < abs(rightDiff) {
-            right = mid
-        } else {
-            left = mid
-        }
-    }
-
-    if let y1 = yAt(eq1, bestX), let y2 = yAt(eq2, bestX) {
-        return (x: bestX, y: (y1 + y2) / 2.0)
-    }
-    return nil
-}
-
-//// Helper extension for chunking arrays into consecutive pairs
-//extension Array {
-//    func chunked(into size: Int) -> [[Element]] {
-//        guard size > 0 else { return [] }
-//        var chunks: [[Element]] = []
-//        var index = 0
-//        while index < count {
-//            let end = Swift.min(index + size, count)
-//            chunks.append(Array(self[index..<end]))
-//            index += size
-//        }
-//        return chunks
-//    }
-//}
