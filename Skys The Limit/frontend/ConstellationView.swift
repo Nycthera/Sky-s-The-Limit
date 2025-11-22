@@ -11,9 +11,13 @@ struct ConstellationView: View {
     
     // Track selected constellation to show in canvas
     @State private var selectedConstellation: Constellation? = nil
-     
+    
     // Store constellation rows from Appwrite
     @State private var constellations: [Constellation] = []
+    
+    // NEW: delete states
+    @State private var showDeleteAlert = false
+    @State private var constellationToDelete: Constellation? = nil
     
     let deviceID: String = UIDevice.current.identifierForVendor?.uuidString ?? "unknown_device"
     
@@ -36,6 +40,10 @@ struct ConstellationView: View {
                         ConstellationCellView(constellation: constellation)
                             .onTapGesture {
                                 selectedConstellation = constellation
+                            }
+                            .onLongPressGesture(minimumDuration: 0.5) {
+                                constellationToDelete = constellation
+                                showDeleteAlert = true
                             }
                     }
                 }
@@ -72,11 +80,27 @@ struct ConstellationView: View {
                 )
             }
         }
+        
         // <-- Full screen cover to show the selected constellation
         .fullScreenCover(item: $selectedConstellation) { constellation in
             CustomConstellationView(ID: constellation.id)
-            
         }
+        
+        // NEW: Delete alert
+        .alert("Delete Constellation?", isPresented: $showDeleteAlert) {
+            Button("Delete", role: .destructive) {
+                Task {
+                    if let c = constellationToDelete {
+                        await deleteConstellation(id: c.id)
+                        await loadConstellations()
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Are you sure you want to delete “\(constellationToDelete?.name ?? "")”?")
+        }
+        
         .onAppear {
             Task {
                 await loadConstellations()
@@ -100,6 +124,11 @@ struct ConstellationView: View {
         DispatchQueue.main.async {
             self.constellations = fetched
         }
+    }
+    
+    // MARK: - Delete document
+    func deleteConstellation(id: String) async {
+        await delete_document(rowId: id)
     }
 }
 
