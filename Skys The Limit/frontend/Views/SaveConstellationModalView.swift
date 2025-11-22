@@ -38,17 +38,17 @@ struct SaveConstellationModalView: View {
         NavigationView {
             VStack(spacing: 25) {
                 Text("Save Constellation")
-                    .font(.custom("SpaceMono-Bold", size: 32)) // increased from 24
+                    .font(.custom("SpaceMono-Bold", size: 38)) // increased from 24
                     .padding(.top, 25)
                 
                 TextField("Enter constellation name", text: $constellationName)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding(.horizontal)
-                    .font(.custom("SpaceMono-Regular", size: 22)) // increased from 18
+                    .font(.custom("SpaceMono-Regular", size: 38)) // increased from 18
                 
                 Toggle(isOn: $isShared) {
                     Text("Share with others")
-                        .font(.custom("SpaceMono-Regular", size: 22)) // increased from 18
+                        .font(.custom("SpaceMono-Regular", size: 32)) // increased from 18
                 }
                 .padding(.horizontal)
                 
@@ -59,7 +59,7 @@ struct SaveConstellationModalView: View {
                         isPresented = false
                         onCancel?()
                     }
-                    .font(.custom("SpaceMono-Regular", size: 22)) // increased from 18
+                    .font(.custom("SpaceMono-Regular", size: 28)) // increased from 18
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.gray.opacity(0.6))
@@ -74,7 +74,7 @@ struct SaveConstellationModalView: View {
                             isPresented = false
                         }
                     }
-                    .font(.custom("SpaceMono-Bold", size: 22)) // increased from 18
+                    .font(.custom("SpaceMono-Bold", size: 28)) // increased from 18
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.blue)
