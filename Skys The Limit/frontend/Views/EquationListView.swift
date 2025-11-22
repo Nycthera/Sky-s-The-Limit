@@ -17,7 +17,6 @@ struct EquationListView: View {
     @State private var newConstellationName = ""
     
     
-    
     var body: some View {
         ZStack {
             NavigationLink(destination: MainMenuView(), isActive: $goHome) {
@@ -155,6 +154,11 @@ struct EquationListView: View {
         
     }
     
+    
+    
+    
+    
+    // ---------------------------------------------------------------------------
     private struct SidebarView: View {
         let isCollapsed: Bool
         let width: CGFloat
@@ -210,10 +214,12 @@ struct EquationListView: View {
         }
     }
     
+    // ----------------------------------------------------------------------
     private struct GameAreaView: View {
         @ObservedObject var viewModel: EquationPuzzleViewModel
         @Binding var currentMathString: String
         let canvasHeight: CGFloat
+        @State private var isConfirmingLine = false
         
         var body: some View {
             VStack(spacing: 15) {
@@ -248,21 +254,32 @@ struct EquationListView: View {
                 )
                 
                 Button {
-                    viewModel.checkCurrentLineSolution()
-                    viewModel.updateUserGraph()
+                    if !isConfirmingLine {
+                        viewModel.checkCurrentLineSolution()
+                        viewModel.updateUserGraph()
+                        // First click: turn the button blue and switch text
+                        isConfirmingLine = true
+                    } else {
+                        // Second click: finalize the line
+                        viewModel.checkCurrentLineSolution()
+                        viewModel.updateUserGraph()
+                        
+                        // Reset button for next line
+                        isConfirmingLine = false
+                    }
                 } label:{
-                    Text("Check Line")
+                    Text(isConfirmingLine ? "Confirm Line" : "Check Line")
                         .font(.custom("SpaceMono-Regular", size: 20))
                         .frame(maxWidth: .infinity, minHeight: 10, maxHeight: 20)
                         .padding(.vertical, 15)
                         .padding(.bottom, 50)
-                        .background(Color.white)
-                        .foregroundColor(.black)
+                        .background(isConfirmingLine ? Color.blue : Color.white)
+                        .foregroundColor(isConfirmingLine ? .white : .black)
                         .cornerRadius(15)
-                        .disabled(viewModel.isPuzzleComplete)
                 }
+                .disabled(viewModel.isPuzzleComplete)
+
             }
         }
     }
 }
-
